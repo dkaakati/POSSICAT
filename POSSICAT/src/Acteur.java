@@ -36,4 +36,12 @@ public class Acteur {
 	public String toString() {
 		return "["+this.getRole()+ " " + this.getName() + "]";
 	}
+	
+	public boolean equals(Object obj) {
+	    if (obj == null) return false;
+	    if (obj == this) return true;
+	    if (!(obj instanceof Acteur)) return false;
+	    Acteur o = (Acteur) obj;
+	    return o.name == this.name;
+	}
 }

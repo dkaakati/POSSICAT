@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -78,7 +79,7 @@ public class Planning {
 		//System.err.println("ACTEUR LE MOINS DISPO " + a);
 		List<Acteur> l = new ArrayList<Acteur>(getActeursEnRelation(a));
 		//System.err.println("ACTEURS EN RELATION " + l);
-		loop:
+		//loop:
 		while(!inserted) {
 			Acteur b = getActeurEnRelationLeMoinsDispo(l);
 			
@@ -109,23 +110,18 @@ public class Planning {
 					nbSoutenancesEnseignants.put(ens.getName(), nbSoutEns);
 					int nbSoutEnsInit = nbSoutenancesInitEnseignants.get(ens.getName())-1;
 					nbSoutenancesInitEnseignants.put(ens.getName(), nbSoutEnsInit);
-					List<Acteur> relEns = relationsEnseignants.get(ens.getName());
-					relEns.remove(tut);
+					removeActeurFromList(relationsEnseignants.get(ens.getName()), tut);
 					if(nbSoutEns==0) {
-						//System.err.println(tut + " A FAIT TOUTES LES SOUTENANCES");
-						enseignants.remove(tut.getName());
-						nbSoutenancesEnseignants.remove(tut.getName());
-						relationsEnseignants.remove(tut.getName());
+						enseignants.remove(ens.getName());
+						nbSoutenancesEnseignants.remove(ens.getName());
+						relationsEnseignants.remove(ens.getName());
 					}
 					
 					tuteurs.get(tut.getName()).put(c.getP(), false);
 					int nbSoutTut = nbSoutenancesTuteurs.get(tut.getName())-1;
 					nbSoutenancesTuteurs.put(tut.getName(), nbSoutTut);
-					List<Acteur> relTut = relationsTuteurs.get(tut.getName());
-					relTut.remove(ens);
-					//System.err.println(nbSoutTut + " SOUTENANCES RESTANTES POUR " + tut);
+					removeActeurFromList(relationsTuteurs.get(tut.getName()), ens);
 					if(nbSoutTut==0) {
-						//System.err.println(tut + " A FAIT TOUTES LES SOUTENANCES");
 						tuteurs.remove(tut.getName());
 						nbSoutenancesTuteurs.remove(tut.getName());
 						relationsTuteurs.remove(tut.getName());
@@ -136,6 +132,9 @@ public class Planning {
 					nbSoutenancesEnseignants.put(can.getName(), nbSoutCan);
 					if(nbSoutCan==0) {
 						//System.err.println(can + " A FAIT TOUTES LES SOUTENANCES");
+						enseignants.remove(tut.getName());
+						nbSoutenancesEnseignants.remove(tut.getName());
+						relationsEnseignants.remove(tut.getName());
 					}
 					
 					List<Creneau> salles = planning.get(c.getP());
@@ -155,8 +154,20 @@ public class Planning {
 					//System.err.println("ERREUR");
 				}
 			}
-			if(nbInserted==4) {
+			/*if(nbInserted==4) {
 				break loop;
+			}*/
+		}
+	}
+	
+	private void removeActeurFromList(List<Acteur> list, Acteur ens) {
+		Iterator<Acteur> it = list.iterator();
+		while(it.hasNext()) {
+			Acteur a = it.next();
+			//System.err.println(a.getName() + " " + ens.getName());
+			if(a.getName().equals(ens.getName())) {
+				//System.err.println("SUPPRESSION DE " + a);
+				it.remove();
 			}
 		}
 	}
@@ -195,7 +206,7 @@ public class Planning {
 		
 		Set<String> keys = enseignants.keySet();
 		for(String name : keys) {
-			if(name != enseignant.getName()) {
+			if(name != enseignant.getName() && resteDesSoutenancesAFaireEnCandide(name)) {
 				Map<Integer, Boolean> map = enseignants.get(name);
 				for(int p : creneauxCommuns) {
 					if(map.get(p)) {
@@ -292,6 +303,10 @@ public class Planning {
 	
 	public boolean resteDesSoutenancesAFaire(String name) {
 		return nbSoutenancesInitEnseignants.get(name)>0;
+	}
+	
+	public boolean resteDesSoutenancesAFaireEnCandide(String name) {
+		return (nbSoutenancesEnseignants.get(name)-nbSoutenancesInitEnseignants.get(name))>0;
 	}
 	
 	public int getDispo(Role a, String name) {
