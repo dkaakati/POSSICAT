@@ -25,7 +25,7 @@ public class Planning {
 	Map<String, List<Acteur>> relationsTuteurs;
 	
 	Map<Integer, List<Boolean>> planning;
-	enum Role {Enseignant, Tuteur};
+	enum Role {Enseignant, Tuteur, Candide};
 
 	public Planning() {
 		readCSV();
@@ -85,8 +85,91 @@ public class Planning {
 		System.err.println("ACTEUR LE MOINS DISPO ["+a.getRole()+ " " + a.getName() + "]");
 		List<Acteur> l = getActeursEnRelation(a);
 		while(!inserted) {
-			//Acteur b 
+			Acteur b = getActeurEnRelationLeMoinsDispo(l);
+			List<Integer> creneauxCommuns = creneauCommun(a, b);
+			while(!creneauxCommuns.isEmpty()) {
+				Creneau c = getCreneau(a, b, creneauxCommuns);
+				if(c != null) {
+					System.err.println("CRENEAU TROUVE");
+					System.err.println("ON INSERE :");
+					System.err.println("\t" + c.getA().getRole() + " " + c.getA().getName());
+					System.err.println("\t" + c.getB().getRole() + " " + c.getB().getName());
+					System.err.println("\t" + c.getC().getRole() + " " + c.getC().getName());
+					System.err.println("\tA la période " + c.getP());
+				}
+			}
 		}
+	}
+	
+	public boolean salleLibre(int p) {
+		List<Boolean> a = planning.get(p);
+		for(boolean b : a) {
+			if(b == true) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public Creneau getCreneau(Acteur a, Acteur b, List<Integer> creneauxCommuns) {
+		
+		Acteur enseignant;
+		if(a.getRole() == Role.Enseignant) {
+			enseignant = a;
+		} else {
+			enseignant = b;
+		}
+		
+		Set<String> keys = enseignants.keySet();
+		for(String name : keys) {
+			if(name != enseignant.getName()) {
+				Map<Integer, Boolean> map = enseignants.get(name);
+				for(int p : creneauxCommuns) {
+					if(map.get(p)) {
+						if(salleLibre(p)) {
+							return new Creneau(p, a, b, new Acteur(Role.Candide, name));
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	public List<Integer> creneauCommun(Acteur a, Acteur b) {
+		Map<Integer, Boolean> dispoA;
+		Map<Integer, Boolean> dispoB;
+		
+		List<Integer> creneauxCommuns = new ArrayList<Integer>();
+		
+		if(a.getRole() == Role.Enseignant) {
+			dispoA = enseignants.get(a.getName());
+			dispoB = tuteurs.get(b.getName());
+		} else {
+			dispoB = enseignants.get(b.getName());
+			dispoA = tuteurs.get(a.getName());
+		}
+		
+		Set<Integer> periodes = dispoA.keySet();
+		for(int p : periodes) {
+			if(dispoA.get(p) && dispoB.get(p)) {
+				creneauxCommuns.add(p);
+			}
+		}
+		return creneauxCommuns;
+	}
+	
+	public Acteur getActeurEnRelationLeMoinsDispo(List<Acteur> l) {
+		Acteur acteur = new Acteur();
+		acteur.setDispo(999);
+
+		for(Acteur a : l) {
+			int dispo = getDispo(a.getRole(), a.getName());
+			if(dispo<acteur.getDispo()) {
+				acteur = a;
+			}
+		}
+		return acteur;
 	}
 	
 	public List<Acteur> getActeursEnRelation(Acteur a) {
@@ -178,6 +261,41 @@ public class Planning {
 		}
 		public void setDispo(int dispo) {
 			this.dispo = dispo;
+		}
+	}
+	
+	class Creneau {
+		Acteur a, b, c;
+		int p;
+		public Creneau(int p,Acteur a, Acteur b, Acteur c) {
+			this.p = p;
+			this.a = a;
+			this.b = b;
+			this.c = c;
+		}
+		public Acteur getA() {
+			return a;
+		}
+		public void setA(Acteur a) {
+			this.a = a;
+		}
+		public Acteur getB() {
+			return b;
+		}
+		public void setB(Acteur b) {
+			this.b = b;
+		}
+		public Acteur getC() {
+			return c;
+		}
+		public void setC(Acteur c) {
+			this.c = c;
+		}
+		public int getP() {
+			return p;
+		}
+		public void setP(int p) {
+			this.p = p;
 		}
 	}
 }
