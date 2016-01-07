@@ -134,7 +134,7 @@ public class CSVParser {
                 relationsEns.add(new Acteur(Role.Tuteur, tuteur));
                 
                 int nbSoutenanceTut = nbSoutenancesTuteurs.get(tuteur);
-                nbSoutenancesTuteurs.put(enseignant, nbSoutenanceTut++);
+                nbSoutenancesTuteurs.put(tuteur, nbSoutenanceTut+1);
                 
                 List<Acteur> relationsTut = relationsTuteurs.get(tuteur);
                 relationsTut.add(new Acteur(Role.Enseignant, enseignant));

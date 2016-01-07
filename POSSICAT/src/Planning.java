@@ -63,6 +63,13 @@ public class Planning {
 		insertData();
 		insertData();
 		insertData();
+		insertData();
+		insertData();
+		insertData();
+		insertData();
+		insertData();
+		insertData();
+		insertData();
 	}
 	
 	public void insertData() {
@@ -105,7 +112,10 @@ public class Planning {
 					List<Acteur> relEns = relationsEnseignants.get(ens.getName());
 					relEns.remove(tut);
 					if(nbSoutEns==0) {
-						System.err.println(ens + " A FAIT TOUTES LES SOUTENANCES");
+						System.err.println(tut + " A FAIT TOUTES LES SOUTENANCES");
+						enseignants.remove(tut.getName());
+						nbSoutenancesEnseignants.remove(tut.getName());
+						relationsEnseignants.remove(tut.getName());
 					}
 					
 					tuteurs.get(tut.getName()).put(c.getP(), false);
@@ -113,14 +123,18 @@ public class Planning {
 					nbSoutenancesTuteurs.put(tut.getName(), nbSoutTut);
 					List<Acteur> relTut = relationsTuteurs.get(tut.getName());
 					relTut.remove(ens);
+					System.err.println(nbSoutTut + " SOUTENANCES RESTANTES POUR " + tut);
 					if(nbSoutTut==0) {
 						System.err.println(tut + " A FAIT TOUTES LES SOUTENANCES");
+						tuteurs.remove(tut.getName());
+						nbSoutenancesTuteurs.remove(tut.getName());
+						relationsTuteurs.remove(tut.getName());
 					}
 					
 					enseignants.get(can.getName()).put(c.getP(), false);
 					int nbSoutCan = nbSoutenancesEnseignants.get(can.getName())-1;
 					nbSoutenancesEnseignants.put(can.getName(), nbSoutCan);
-					if(nbSoutEns==0) {
+					if(nbSoutCan==0) {
 						System.err.println(can + " A FAIT TOUTES LES SOUTENANCES");
 					}
 					
@@ -141,7 +155,7 @@ public class Planning {
 					System.err.println("ERREUR");
 				}
 			}
-			if(nbInserted==3) {
+			if(nbInserted==4) {
 				break loop;
 			}
 		}
@@ -272,6 +286,7 @@ public class Planning {
 			}
 		}
 		
+		System.err.println(acteur);
 		return acteur;
 	}
 	
@@ -291,6 +306,10 @@ public class Planning {
 					nbPeriodeLibre++;
 				}
 			}
+			if(nbSoutenance==0) {
+				System.err.println("PFF");
+				//return 999;
+			}
 			return nbPeriodeLibre-nbSoutenance;
 		} else {
 			int nbSoutenance = nbSoutenancesTuteurs.get(name);
@@ -302,6 +321,10 @@ public class Planning {
 				if(m.get(i)) {
 					nbPeriodeLibre++;
 				}
+			}
+			if(nbSoutenance==0) {
+				System.err.println("PFF");
+				//return 999;
 			}
 			return nbPeriodeLibre-nbSoutenance;
 		}
