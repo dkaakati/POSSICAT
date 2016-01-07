@@ -29,6 +29,7 @@ public class CSVParser {
             br = new BufferedReader(new FileReader(donnees));
             while ((line = br.readLine()) != null) {
                 // use comma as separator
+            	line += " ";
                 String[] row = line.split(cvsSplitBy);
                 if(!row[0].equals("")) {
                     Map<Integer, Boolean> contraintes = new HashMap<>();
