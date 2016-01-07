@@ -75,25 +75,25 @@ public class Planning {
 	public void insertData() {
 		boolean inserted = false;
 		Acteur a = getActeurMoinsDisponible();
-		System.err.println("ACTEUR LE MOINS DISPO " + a);
+		//System.err.println("ACTEUR LE MOINS DISPO " + a);
 		List<Acteur> l = new ArrayList<Acteur>(getActeursEnRelation(a));
-		System.err.println("ACTEURS EN RELATION " + l);
+		//System.err.println("ACTEURS EN RELATION " + l);
 		loop:
 		while(!inserted) {
 			Acteur b = getActeurEnRelationLeMoinsDispo(l);
 			
-			System.err.println("ACTEUR EN RELATION LE MOINS DISPO " + b);
+			//System.err.println("ACTEUR EN RELATION LE MOINS DISPO " + b);
 			List<Integer> creneauxCommuns = creneauCommun(a, b);
-			System.err.println("LISTE DES CRENEAUX COMMUNS " + creneauxCommuns);
+			//System.err.println("LISTE DES CRENEAUX COMMUNS " + creneauxCommuns);
 			if(creneauxCommuns.isEmpty()) {
-				System.err.println("PAS DE CRENEAUX COMMUNS");
+				//System.err.println("PAS DE CRENEAUX COMMUNS");
 				l.remove(b);
 			}
 			while(!creneauxCommuns.isEmpty() && !inserted) {
 				Creneau c = getCreneau(a, b, creneauxCommuns);
 				if(c != null) {
-					System.err.println("CRENEAU TROUVE");
-					System.err.println("ON INSERE :");
+					//System.err.println("CRENEAU TROUVE");
+					System.err.println(nbInserted + "\n-----------------");
 					System.err.println("\t" + c.getA().getRole() + " " + c.getA().getName());
 					System.err.println("\t" + c.getB().getRole() + " " + c.getB().getName());
 					System.err.println("\t" + c.getC().getRole() + " " + c.getC().getName());
@@ -112,7 +112,7 @@ public class Planning {
 					List<Acteur> relEns = relationsEnseignants.get(ens.getName());
 					relEns.remove(tut);
 					if(nbSoutEns==0) {
-						System.err.println(tut + " A FAIT TOUTES LES SOUTENANCES");
+						//System.err.println(tut + " A FAIT TOUTES LES SOUTENANCES");
 						enseignants.remove(tut.getName());
 						nbSoutenancesEnseignants.remove(tut.getName());
 						relationsEnseignants.remove(tut.getName());
@@ -123,9 +123,9 @@ public class Planning {
 					nbSoutenancesTuteurs.put(tut.getName(), nbSoutTut);
 					List<Acteur> relTut = relationsTuteurs.get(tut.getName());
 					relTut.remove(ens);
-					System.err.println(nbSoutTut + " SOUTENANCES RESTANTES POUR " + tut);
+					//System.err.println(nbSoutTut + " SOUTENANCES RESTANTES POUR " + tut);
 					if(nbSoutTut==0) {
-						System.err.println(tut + " A FAIT TOUTES LES SOUTENANCES");
+						//System.err.println(tut + " A FAIT TOUTES LES SOUTENANCES");
 						tuteurs.remove(tut.getName());
 						nbSoutenancesTuteurs.remove(tut.getName());
 						relationsTuteurs.remove(tut.getName());
@@ -135,7 +135,7 @@ public class Planning {
 					int nbSoutCan = nbSoutenancesEnseignants.get(can.getName())-1;
 					nbSoutenancesEnseignants.put(can.getName(), nbSoutCan);
 					if(nbSoutCan==0) {
-						System.err.println(can + " A FAIT TOUTES LES SOUTENANCES");
+						//System.err.println(can + " A FAIT TOUTES LES SOUTENANCES");
 					}
 					
 					List<Creneau> salles = planning.get(c.getP());
@@ -152,7 +152,7 @@ public class Planning {
 					nbInserted++;
 					
 				} else {
-					System.err.println("ERREUR");
+					//System.err.println("ERREUR");
 				}
 			}
 			if(nbInserted==4) {
@@ -227,7 +227,7 @@ public class Planning {
 		//System.err.println(dispoB);
 		
 		if(dispoA == null || dispoB == null) {
-			System.err.println("IL N'Y A PLUS DE POSSIBILITES");
+			//System.err.println("IL N'Y A PLUS DE POSSIBILITES");
 			return creneauxCommuns;
 		}
 		
@@ -286,7 +286,7 @@ public class Planning {
 			}
 		}
 		
-		System.err.println(acteur);
+		//System.err.println(acteur);
 		return acteur;
 	}
 	
@@ -307,7 +307,7 @@ public class Planning {
 				}
 			}
 			if(nbSoutenance==0) {
-				System.err.println("PFF");
+				//System.err.println("PFF");
 				//return 999;
 			}
 			return nbPeriodeLibre-nbSoutenance;
@@ -323,7 +323,7 @@ public class Planning {
 				}
 			}
 			if(nbSoutenance==0) {
-				System.err.println("PFF");
+				//System.err.println("PFF");
 				//return 999;
 			}
 			return nbPeriodeLibre-nbSoutenance;
