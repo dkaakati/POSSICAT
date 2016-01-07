@@ -33,7 +33,9 @@ public class Planning {
 
 	public void readCSV() {
 		// Ouvrir le fichier CSV
-
+		CSVParser parser = new CSVParser();
+		parser.readEnseignants(8); /* Le paramètre est le nombre de périodes par jour
+/*
 
 		// On récupère N le nombre de période
 		N = 10;
@@ -76,7 +78,7 @@ public class Planning {
 		
 		while(true) {
 			insertData();
-		}
+		}*/
 	}
 	
 	public void insertData() {
