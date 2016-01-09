@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class CSVParser {
 
-    public void readDispo(Role r, Map<String, Map<Integer, Boolean>> acteurs, int periodesParJour) {
+    public void readDispo(Role r, ListActeur acteurs, int periodesParJour) {
         
         String donnees;
         if(r == Role.Enseignant) {
@@ -37,10 +37,10 @@ public class CSVParser {
                     for(int i = 1; i < row.length; i++) {
                         for(int j = 0; j < periodesParJour; j++) {
 
-                            if(row[i].equals("X")) {
+                            if(row[i].contains("X")) {
                                 contraintes.put(periodeEnCours, true);
                             }
-                            else if(row[i].equals("M")){
+                            else if(row[i].contains("M")){
                                 if(j <= periodesParJour/2 -1) {
                                     contraintes.put(periodeEnCours, true);
                                 }
@@ -48,7 +48,7 @@ public class CSVParser {
                                     contraintes.put(periodeEnCours, false);
                                 }
                             }
-                            else if(row[i].equals("AM")){
+                            else if(row[i].contains("AM")){
                                 if(j > periodesParJour/2 -1) {
                                     contraintes.put(periodeEnCours, true);
                                 }
@@ -62,11 +62,20 @@ public class CSVParser {
                             periodeEnCours++;
                         }
                     }
-                    acteurs.put(row[0], contraintes);
+                    
+            		
+                    Acteur a = null;
+                    if(r == Role.Enseignant) {
+                    	a = new Enseignant(row[0]);
+                    }
+                    if(r == Role.Tuteur) {
+                    	a = new Tuteur(row[0]);
+                    }
+                    a.setDisponibilites(contraintes);
+                    acteurs.list.add(a);
                 }
 
             }
-            System.out.print(acteurs);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -80,8 +89,6 @@ public class CSVParser {
                 }
             }
         }
-
-        System.out.println("Done");
     }
 
 	/**
@@ -93,30 +100,14 @@ public class CSVParser {
 	 * @param relationsTuteurs
 	 * @param N
 	 */
-	public void readCSV(Map<String, Map<Integer, Boolean>> enseignants,
-			Map<String, Map<Integer, Boolean>> tuteurs,
-			Map<String, Integer> nbSoutenancesEnseignants,
-			Map<String, Integer> nbSoutenancesTuteurs,
-			Map<String, List<Acteur>> relationsEnseignants,
-			Map<String, List<Acteur>> relationsTuteurs, int N) {
-		
-		Set<String> nomsEnseignants = enseignants.keySet();
-		for(String name : nomsEnseignants) {
-			nbSoutenancesEnseignants.put(name, 0);
-			relationsEnseignants.put(name, new ArrayList<Acteur>());
-		}
-		
-		Set<String> nomsTuteurs = tuteurs.keySet();
-		for(String name : nomsTuteurs) {
-			nbSoutenancesTuteurs.put(name, 0);
-			relationsTuteurs.put(name, new ArrayList<Acteur>());
-		}
+	public int readCSV(ListActeur enseignants, ListActeur tuteurs, int N) {
         
         String donnees= "data/donneesLite.csv";
 
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",";
+        int nbSoutenance = 0;
         
         try {
 
@@ -125,20 +116,18 @@ public class CSVParser {
             while ((line = br.readLine()) != null) {
                 // use comma as separator
                 String[] row = line.split(cvsSplitBy);
-                String enseignant = row[4];
-                String tuteur = row[5];
+                String ens_name = row[4];
+                String tut_name = row[5];
                 
-                int nbSoutenanceEns = nbSoutenancesEnseignants.get(enseignant);
-                nbSoutenancesEnseignants.put(enseignant, nbSoutenanceEns+2);
+                Enseignant e = (Enseignant)enseignants.get(ens_name);
+                e.incNbSoutenances();
+                e.incNbSoutenancesCandide();
+                e.addRelation(tuteurs.get(tut_name));
                 
-                List<Acteur> relationsEns = relationsEnseignants.get(enseignant);
-                relationsEns.add(new Acteur(Role.Tuteur, tuteur));
-                
-                int nbSoutenanceTut = nbSoutenancesTuteurs.get(tuteur);
-                nbSoutenancesTuteurs.put(tuteur, nbSoutenanceTut+1);
-                
-                List<Acteur> relationsTut = relationsTuteurs.get(tuteur);
-                relationsTut.add(new Acteur(Role.Enseignant, enseignant));
+                Tuteur t = (Tuteur)tuteurs.get(tut_name);
+                t.incNbSoutenances();
+                t.addRelation(enseignants.get(ens_name));
+                nbSoutenance++;
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -154,6 +143,7 @@ public class CSVParser {
             }
         }
 		
+        return nbSoutenance;
 	}
 
 }

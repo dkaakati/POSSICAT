@@ -7,36 +7,38 @@
  * @date 7 janv. 2016
  */
 public class Creneau {
-	Acteur a, b, c;
-	int p;
-	public Creneau(int p,Acteur a, Acteur b, Acteur c) {
-		this.p = p;
-		this.a = a;
-		this.b = b;
-		this.c = c;
+	Enseignant enseignant;
+	Enseignant candide;
+	Tuteur tuteur;
+	int periode;
+	public Creneau(int periode, Enseignant e, Enseignant c, Tuteur t) {
+		this.periode = periode;
+		this.enseignant = e;
+		this.tuteur = t;
+		this.candide = c;
 	}
-	public Acteur getA() {
-		return a;
+	public Enseignant getEnseignant() {
+		return enseignant;
 	}
-	public void setA(Acteur a) {
-		this.a = a;
+	public void setEnseignant(Enseignant enseignant) {
+		this.enseignant = enseignant;
 	}
-	public Acteur getB() {
-		return b;
+	public Enseignant getCandide() {
+		return candide;
 	}
-	public void setB(Acteur b) {
-		this.b = b;
+	public void setCandide(Enseignant candide) {
+		this.candide = candide;
 	}
-	public Acteur getC() {
-		return c;
+	public Tuteur getTuteur() {
+		return tuteur;
 	}
-	public void setC(Acteur c) {
-		this.c = c;
+	public void setTuteur(Tuteur tuteur) {
+		this.tuteur = tuteur;
 	}
-	public int getP() {
-		return p;
+	public int getPeriode() {
+		return periode;
 	}
-	public void setP(int p) {
-		this.p = p;
+	public void setPeriode(int periode) {
+		this.periode = periode;
 	}
 }

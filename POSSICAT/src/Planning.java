@@ -12,39 +12,20 @@ public class Planning {
 	boolean isFinised = false;
 	int nbInserted = 0;
 	
-	Map<String, Map<Integer, Boolean>> enseignants;
-	Map<String, Integer> nbSoutenancesEnseignants;
-	Map<String, Integer> nbSoutenancesInitEnseignants;
-	Map<String, List<Acteur>> relationsEnseignants;
-	
-	Map<String, Map<Integer, Boolean>> tuteurs;
-	Map<String, Integer> nbSoutenancesTuteurs;
-	Map<String, List<Acteur>> relationsTuteurs;
-	
+	ListActeur enseignants = new ListActeur();
+	ListActeur tuteurs = new ListActeur();
 	Map<Integer, List<Creneau>> planning;
+	
 
 	public Planning() {
 		readCSV();
 	};
 
 	public void readCSV() {
-		enseignants = new HashMap<String, Map<Integer, Boolean>>();
-		nbSoutenancesEnseignants = new HashMap<String, Integer>();
-		nbSoutenancesTuteurs = new HashMap<String, Integer>();
-		
-		tuteurs = new HashMap<String, Map<Integer, Boolean>>();
-		relationsEnseignants = new HashMap<String, List<Acteur>>();
-		relationsTuteurs = new HashMap<String, List<Acteur>>();
-		
-		planning = new HashMap<Integer, List<Creneau>>();
-		
-		// Ouvrir le fichier CSV
-		CSVParser parser = new CSVParser();
-		parser.readDispo(Role.Enseignant, enseignants, 8);
-		parser.readDispo(Role.Tuteur, tuteurs, 8);
 		
 		N = 8*5;
 		
+		planning = new HashMap<Integer, List<Creneau>>();
 		for(int periode = 0; periode < N ; periode++) {
 			List<Creneau> salles = new ArrayList<Creneau>();
 			salles.add(null);
@@ -52,16 +33,19 @@ public class Planning {
 			planning.put(periode, salles);
 		}
 		
-		System.out.println(tuteurs);
-		parser.readCSV(enseignants, tuteurs, nbSoutenancesEnseignants, nbSoutenancesTuteurs, relationsEnseignants, relationsTuteurs, N);
-		
-		nbSoutenancesInitEnseignants = new HashMap<String, Integer>();
-		Set<String> ensName = nbSoutenancesEnseignants.keySet();
-		for(String s: ensName) {
-			nbSoutenancesInitEnseignants.put(s, nbSoutenancesEnseignants.get(s)/2);
-		}
+		CSVParser parser = new CSVParser();
+		parser.readDispo(Role.Enseignant, enseignants, 8);
+		parser.readDispo(Role.Tuteur, tuteurs, 8);
+		//System.err.println(enseignants.list.size() + " enseignants");
+		//System.err.println(tuteurs.list.size() + " tuteurs");
 
-		for(int i = 0; i < 9; i++) {
+		int nbSoutenance = parser.readCSV(enseignants, tuteurs, N);
+		//System.err.println(nbSoutenance + " soutenances");
+		
+		
+	
+
+		for(int i = 0; i < nbSoutenance; i++) {
 			insertData();
 		}
 		
@@ -69,294 +53,127 @@ public class Planning {
 	
 	public void insertData() {
 		boolean inserted = false;
-		Acteur a = getActeurMoinsDisponible();
-		//System.err.println("ACTEUR LE MOINS DISPO " + a);
-		List<Acteur> l = new ArrayList<Acteur>(getActeursEnRelation(a));
-		//System.err.println("ACTEURS EN RELATION " + l);
-		//loop:
-		while(!inserted) {
-			Acteur b = getActeurEnRelationLeMoinsDispo(l);
-			
-			//System.err.println("ACTEUR EN RELATION LE MOINS DISPO " + b);
-			List<Integer> creneauxCommuns = creneauCommun(a, b);
-			//System.err.println("LISTE DES CRENEAUX COMMUNS " + creneauxCommuns);
-			if(creneauxCommuns.isEmpty()) {
-				//System.err.println("PAS DE CRENEAUX COMMUNS");
-				l.remove(b);
-			}
-			while(!creneauxCommuns.isEmpty() && !inserted) {
-				Creneau c = getCreneau(a, b, creneauxCommuns);
-				if(c != null) {
-					//System.err.println("CRENEAU TROUVE");
-					System.err.println(nbInserted + "\n-----------------");
-					System.err.println("\t" + c.getA().getRole() + " " + c.getA().getName());
-					System.err.println("\t" + c.getB().getRole() + " " + c.getB().getName());
-					System.err.println("\t" + c.getC().getRole() + " " + c.getC().getName());
-					System.err.println("\tA la période " + c.getP());
-					
-					inserted = true;
-					Acteur ens = getActeur(Role.Enseignant, c.getA(), c.getB(), c.getC());
-					Acteur tut = getActeur(Role.Tuteur, c.getA(), c.getB(), c.getC());
-					Acteur can = getActeur(Role.Candide, c.getA(), c.getB(), c.getC());
-					
-					enseignants.get(ens.getName()).put(c.getP(), false);
-					//System.err.println(enseignants.get(ens.getName()));
-					int nbSoutEns = nbSoutenancesEnseignants.get(ens.getName())-1;
-					nbSoutenancesEnseignants.put(ens.getName(), nbSoutEns);
-					int nbSoutEnsInit = nbSoutenancesInitEnseignants.get(ens.getName())-1;
-					nbSoutenancesInitEnseignants.put(ens.getName(), nbSoutEnsInit);
-					removeActeurFromList(relationsEnseignants.get(ens.getName()), tut);
-					if(nbSoutEns==0) {
-						//System.err.println("ON REMOVE " + ens);
-						enseignants.remove(ens.getName());
-						nbSoutenancesEnseignants.remove(ens.getName());
-						relationsEnseignants.remove(ens.getName());
-					}
-					
-					tuteurs.get(tut.getName()).put(c.getP(), false);
-					int nbSoutTut = nbSoutenancesTuteurs.get(tut.getName())-1;
-					nbSoutenancesTuteurs.put(tut.getName(), nbSoutTut);
-					removeActeurFromList(relationsTuteurs.get(tut.getName()), ens);
-					if(nbSoutTut==0) {
-						//System.err.println("ON REMOVE " + tut);
-						tuteurs.remove(tut.getName());
-						nbSoutenancesTuteurs.remove(tut.getName());
-						relationsTuteurs.remove(tut.getName());
-					}
-					
-					enseignants.get(can.getName()).put(c.getP(), false);
-					int nbSoutCan = nbSoutenancesEnseignants.get(can.getName())-1;
-					nbSoutenancesEnseignants.put(can.getName(), nbSoutCan);
-					if(nbSoutCan==0) {
-						//System.err.println("ON REMOVE " + can);
-						//System.err.println(can + " A FAIT TOUTES LES SOUTENANCES");
-						enseignants.remove(can.getName());
-						nbSoutenancesEnseignants.remove(can.getName());
-						relationsEnseignants.remove(can.getName());
-					}
-					
-					List<Creneau> salles = planning.get(c.getP());
-					if(salles.get(0) == null) {
-						System.err.println("\tSalle 1");
-						salles.remove(0);
-						salles.add(c);
-					} else if(salles.get(1) == null) {
-						System.err.println("\tSalle 2");
-						salles.remove(1);
-						salles.add(c);
-					}
-					
-					nbInserted++;
-					
-				} else {
-					//System.err.println("ERREUR");
-				}
-			}
-			/*if(nbInserted==4) {
-				break loop;
-			}*/
-		}
-	}
-	
-	private void removeActeurFromList(List<Acteur> list, Acteur ens) {
-		Iterator<Acteur> it = list.iterator();
-		while(it.hasNext()) {
-			Acteur a = it.next();
-			//System.err.println(a.getName() + " " + ens.getName());
-			if(a.getName().equals(ens.getName())) {
-				//System.err.println("SUPPRESSION DE " + a);
-				it.remove();
-			}
-		}
-	}
-	
-	public Acteur getActeur(Role r, Acteur a, Acteur b, Acteur c) {
-		if(a.getRole() == r) {
-			return a;
-		}
-		if(b.getRole() == r) {
-			return b;
-		}
-		if(c.getRole() == r) {
-			return c;
-		}
-		return null;
-	}
-	
-	public boolean salleLibre(int p) {
-		List<Creneau> a = planning.get(p);
-		for(Creneau c : a) {
-			if(c == null) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public Creneau getCreneau(Acteur a, Acteur b, List<Integer> creneauxCommuns) {
 		
-		Acteur enseignant;
-		if(a.getRole() == Role.Enseignant) {
-			enseignant = a;
+		//System.err.println("On récupère l'acteur le moins disponible (enseignant ou tuteur)");
+		Acteur act = getActeurLeMoinsDisponible();
+		Enseignant e = null;
+		Tuteur t = null;
+		if(act instanceof Enseignant) {
+			e = (Enseignant)act;
 		} else {
-			enseignant = b;
+			t = (Tuteur)act;
 		}
+		//System.err.println("Acteur le moins disponible : " + act);
+		//System.err.println("");
+		//System.err.println("On récupère les acteurs en relations les moins disponibles");
 		
-		//System.err.println("ENSEIGNANT = " + enseignant);
+		ListActeur l = new ListActeur(act.getRelations());
+		//System.err.println("Liste des acteurs en relation " + l);
 		
-		Set<String> keys = new HashSet<String>(enseignants.keySet());
-		int maxSoutCandide = 0;
-		String theEnseignant = "";
-		
-		while(!keys.isEmpty()) {
-			for(String name : keys) {
+		while(!inserted) {
+			//System.err.println(l);
+			act = l.getActeurLeMoinsDisponible();
+			if(act instanceof Enseignant) {
+				e = (Enseignant)act;
+			} else {
+				t = (Tuteur)act;
+			}
+			Creneau c = creneauCommun(e, t);
+			if(c==null) {
+				l.list.remove(act);
+			} else {
+				inserted = true;
+				System.err.println(nbInserted + "\n-----------------");
+				System.err.println("\tEnseignant " + c.getEnseignant());
+				System.err.println("\tTuteur " + c.getTuteur());
+				System.err.println("\tCandide " + c.getCandide());
+				System.err.println("\tA la période " + c.getPeriode());
 				
-				int resteDesSoutenancesAFaireEnCandide = nbSoutenancesEnseignants.get(name)-nbSoutenancesInitEnseignants.get(name);
-				if(resteDesSoutenancesAFaireEnCandide>maxSoutCandide) {
-					maxSoutCandide = resteDesSoutenancesAFaireEnCandide;
-					theEnseignant = name;
+				e.addDisponibilite(c.getPeriode());
+				t.addDisponibilite(c.getPeriode());
+				c.getCandide().addDisponibiliteCandide(c.getPeriode());
+				
+				e.removeRelation(t);
+				t.removeRelation(e);
+				
+				if(e.aFaitToutesLesSoutenances()) {
+					enseignants.list.remove(e);
 				}
-			}
-			
-			if(!theEnseignant.equals(enseignant.getName()) && resteDesSoutenancesAFaireEnCandide(theEnseignant)) {
-				Map<Integer, Boolean> map = enseignants.get(theEnseignant);
-				for(int p : creneauxCommuns) {
-					if(map.get(p)) {
-						if(salleLibre(p)) {
-							return new Creneau(p, a, b, new Acteur(Role.Candide, theEnseignant));
-						}
-					}
+				if(t.aFaitToutesLesSoutenances()) {
+					tuteurs.list.remove(t);
 				}
-				//System.err.println("PAS DE CRENEAU EN COMMUN");
+				if(c.getCandide().aFaitToutesLesSoutenances()) {
+					enseignants.list.remove(c.getCandide());
+				}
+				
+				List<Creneau> salles = planning.get(c.getPeriode());
+				if(salles.get(0) == null) {
+					System.err.println("\tSalle 1");
+					salles.remove(0);
+					salles.add(c);
+				} else if(salles.get(1) == null) {
+					System.err.println("\tSalle 2");
+					salles.remove(1);
+					salles.add(c);
+				}
+				
+				nbInserted++;
 			}
-			keys.remove(theEnseignant);
-			maxSoutCandide = 0;
 		}
-		return null;
 	}
 	
-	public List<Integer> creneauCommun(Acteur a, Acteur b) {
-		Map<Integer, Boolean> dispoA;
-		Map<Integer, Boolean> dispoB;
+	public Acteur getActeurLeMoinsDisponible() {
+		
+		Acteur e = enseignants.getActeurLeMoinsDisponible();
+		Acteur t = tuteurs.getActeurLeMoinsDisponible();
+		
+		if(e.getDisponibilitesSoutenances()<t.getDisponibilitesSoutenances()) {
+			return e;
+		} else {
+			return t;
+		}
+	}
+	
+	public Creneau creneauCommun(Enseignant e, Tuteur t) {
+		//System.err.println(e + " " + t);
+		Map<Integer, Boolean> dispoEnseignant = e.getDisponibilites();
+		Map<Integer, Boolean> dispoTuteur = t.getDisponibilites();
 		
 		List<Integer> creneauxCommuns = new ArrayList<Integer>();
 		
-		if(a.getRole() == Role.Enseignant) {
-			dispoA = enseignants.get(a.getName());
-			dispoB = tuteurs.get(b.getName());
-		} else {
-			dispoB = enseignants.get(b.getName());
-			dispoA = tuteurs.get(a.getName());
+		if(dispoEnseignant == null || dispoTuteur == null) {
+			return null;
 		}
 		
-		//System.err.println(dispoA);
-		//System.err.println(dispoB);
-		
-		if(dispoA == null || dispoB == null) {
-			//System.err.println("IL N'Y A PLUS DE POSSIBILITES");
-			return creneauxCommuns;
-		}
-		
-		Set<Integer> periodes = dispoA.keySet();
+		Set<Integer> periodes = dispoEnseignant.keySet();
 		for(int p : periodes) {
-			//System.err.println(dispoA.get(p) + " " + dispoB.get(p));
-			if(dispoA.get(p) && dispoB.get(p)) {
+			if(dispoEnseignant.get(p) && dispoTuteur.get(p)) {
 				creneauxCommuns.add(p);
 			}
 		}
-		return creneauxCommuns;
-	}
-	
-	public Acteur getActeurEnRelationLeMoinsDispo(List<Acteur> l) {
-		Acteur acteur = new Acteur();
-		acteur.setDispo(999);
+		
+		//System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxCommuns);
+		
+		Set<Acteur> listeCandide = new HashSet<Acteur>(enseignants.list);
+		listeCandide.remove(e);
+		Enseignant c = null;
+		
+		while(!listeCandide.isEmpty()) {
+			for(Acteur act: listeCandide) {
+				Enseignant a = (Enseignant)act;
+				// On récupère le candide a qui il reste le plus de soutenances a voir
+				if(c == null || a.getNbSoutenancesCandide()>c.getNbSoutenancesCandide()) {
+					c = a;
+				}
+			}
+			for(int periode : creneauxCommuns) {
+				if(c.getDisponibilites().get(periode)) {
+					return new Creneau(periode, e, c, t);
+				}
+			}
+			listeCandide.remove(c);
+		}
 
-		for(Acteur a : l) {
-			int dispo = getDispo(a.getRole(), a.getName());
-			if(dispo<acteur.getDispo()) {
-				acteur = a;
-			}
-		}
-		return acteur;
-	}
-	
-	public List<Acteur> getActeursEnRelation(Acteur a) {
-		if(a.getRole() == Role.Enseignant) {
-			return relationsEnseignants.get(a.getName());
-		} else {
-			return relationsTuteurs.get(a.getName());
-		}
-	}
-	
-	public Acteur getActeurMoinsDisponible() {
-		Acteur acteur = new Acteur();
-		acteur.setDispo(999);
-		
-		Set<String> keys = enseignants.keySet();
-		for(String name : keys) {
-			int dispo = getDispo(Role.Enseignant, name);
-			if(dispo<acteur.getDispo() && resteDesSoutenancesAFaire(name)) {
-				acteur.setDispo(dispo);
-				acteur.setName(name);
-				acteur.setRole(Role.Enseignant);
-			}
-		}
-		
-		keys = tuteurs.keySet();
-		for(String name : keys) {
-			int dispo = getDispo(Role.Tuteur, name);
-			if(dispo<acteur.getDispo()) {
-				acteur.setDispo(dispo);
-				acteur.setName(name);
-				acteur.setRole(Role.Tuteur);
-			}
-		}
-		
-		//System.err.println(acteur);
-		return acteur;
-	}
-	
-	public boolean resteDesSoutenancesAFaire(String name) {
-		return nbSoutenancesInitEnseignants.get(name)>0;
-	}
-	
-	public boolean resteDesSoutenancesAFaireEnCandide(String name) {
-		return (nbSoutenancesEnseignants.get(name)-nbSoutenancesInitEnseignants.get(name))>0;
-	}
-	
-	public int getDispo(Role a, String name) {
-		if(a == a.Enseignant) {
-			int nbSoutenance = nbSoutenancesEnseignants.get(name);
-			
-			Map<Integer, Boolean> m = enseignants.get(name);
-			int nbPeriodeLibre = 0;
-			Set<Integer> keys = m.keySet();
-			for(int i : keys) {
-				if(m.get(i)) {
-					nbPeriodeLibre++;
-				}
-			}
-			if(nbSoutenance==0) {
-				//System.err.println("PFF");
-				//return 999;
-			}
-			return nbPeriodeLibre-nbSoutenance;
-		} else {
-			int nbSoutenance = nbSoutenancesTuteurs.get(name);
-			
-			Map<Integer, Boolean> m = tuteurs.get(name);
-			int nbPeriodeLibre = 0;
-			Set<Integer> keys = m.keySet();
-			for(int i : keys) {
-				if(m.get(i)) {
-					nbPeriodeLibre++;
-				}
-			}
-			if(nbSoutenance==0) {
-				//System.err.println("PFF");
-				//return 999;
-			}
-			return nbPeriodeLibre-nbSoutenance;
-		}
+		return null;
 	}
 }
