@@ -12,6 +12,7 @@ public class Creneau {
 	private Tuteur tuteur;
 	private Student student;
 	private int periode;
+	private int salle;
 	
 	public Creneau(int periode, Enseignant e, Enseignant c, Tuteur t, Student s) {
 		this.periode = periode;
@@ -51,6 +52,12 @@ public class Creneau {
 		this.student = student;
 	}
 	
+	public int getSalle() {
+		return salle;
+	}
+	public void setSalle(int salle) {
+		this.salle = salle;
+	}
 	public String toString() {
 		return this.periode + " " + this.enseignant + " " + this.tuteur + " " + this.candide + " " + this.student;
 	}

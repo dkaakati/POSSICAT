@@ -31,8 +31,8 @@ public class Planning {
 		planning = new HashMap<Integer, List<Creneau>>();
 		for(int periode = 0; periode < N ; periode++) {
 			List<Creneau> salles = new ArrayList<Creneau>();
-			salles.add(null);
-			salles.add(null);
+			//salles.add(null);
+			//salles.add(null);
 			planning.put(periode, salles);
 		}
 		
@@ -139,22 +139,28 @@ public class Planning {
 					enseignants.list.remove(c.getCandide());
 				}
 				
-				List<Creneau> salles = planning.get(c.getPeriode());
-				if(salles.get(0) == null) {
-					System.err.println("\tSalle 1");
-					salles.remove(0);
-					salles.add(c);
-				} else if(salles.get(1) == null) {
-					System.err.println("\tSalle 2");
-					salles.remove(1);
-					salles.add(c);
-				}
+				insertCreneauInPlanning(c);
 				
 				nbInserted++;
 			}
 		}
 	}
 	
+	private void insertCreneauInPlanning(Creneau c) {
+		List<Creneau> salles = planning.get(c.getPeriode());
+		
+		int size = salles.size();
+		if(size == 0) {
+			c.setSalle(1);
+			salles.add(c);
+		} else if(size == 1) {
+			c.setSalle(2);
+			salles.add(c);
+		} else {
+			new Exception("Plus de salles disponibles");
+		}
+	}
+
 	private Student getStudent(Enseignant e, Tuteur t) {
 		for(Student s : etudiants) {
 			if(s.getEnseignant() == e && s.getTuteur() == t) {
@@ -224,7 +230,11 @@ public class Planning {
 			}
 			for(int periode : creneauxCommuns) {
 				if(c.getDisponibilites().get(periode)) {
-					return new Creneau(periode, e, c, t, s);
+					// Vérifier si une salle est disponible
+					System.err.println("SALLES DISPO " + planning.get(periode).size());
+					if(planning.get(periode).size()<2) {
+						return new Creneau(periode, e, c, t, s);
+					}
 				}
 			}
 			listeCandide.remove(c);
