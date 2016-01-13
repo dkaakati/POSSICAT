@@ -160,29 +160,29 @@ public class CSVParser {
 	 * @throws IOException 
 	 */
 	public void writeData(Map<Integer, List<Creneau>> planning) throws IOException {
-		StringBuilder sb = new StringBuilder("Période" + ";" 
+		/*StringBuilder sb = new StringBuilder("Période" + ";" 
 				+ "Etudiant" + ";"
 				+ "Tuteur" + ";"
 				+ "Enseignant" + ";"
-				+ "Candide" + "\n");
+				+ "Candide" + "\n");*/
+		StringBuilder sb = new StringBuilder();
 		Set<Integer> periodes = planning.keySet();
 		for(int periode : periodes) {
+			if(periode%8==0) {
+				sb.append("\n\nJOUR " + ((periode/8)+1) + "\n");
+				sb.append(";SALLE 0;;;;;SALLE1\n");
+			}
 			List<Creneau> creneaux = planning.get(periode);
 			for(Creneau c : creneaux) {
-				if(c != null) {
-					System.err.println(c);
-					System.err.println(c.getPeriode() + ";" 
-							+ c.getStudent() + ";"
+					if(c.getSalle()==1) {
+						sb.append(c.getHoraire() + ";");
+					}
+					sb.append(c.getStudent() + ";"
 							+ c.getTuteur() + ";"
 							+ c.getEnseignant() + ";"
-							+ c.getCandide() + "\n");
-					sb.append(c.getPeriode() + ";" 
-							+ c.getStudent() + ";"
-							+ c.getTuteur() + ";"
-							+ c.getEnseignant() + ";"
-							+ c.getCandide() + "\n");
-				}
+							+ c.getCandide() + "; ;");
 			}
+			sb.append("\n");
 		}
 		System.out.println(sb.toString());
 		Files.write(sb, new File("data/output.csv"), Charsets.UTF_8);
