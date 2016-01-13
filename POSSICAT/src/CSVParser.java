@@ -169,8 +169,7 @@ public class CSVParser {
 		Set<Integer> periodes = planning.keySet();
 		for(int periode : periodes) {
 			if(periode%8==0) {
-				sb.append(",,,,,,,,,,,\n,,,,,,,,,,,\nJOUR " + ((periode/8)+1) + ",,,,,,,,,,,\n");
-				sb.append(",SALLE 0,,,,,SALLE1,,,,,\n");
+				sb.append(",,,,,,,,,,,\nJOUR " + ((periode/8)+1) + ",SALLE 0,,,,,SALLE1,,,,,\n");
 			}
 			List<Creneau> creneaux = planning.get(periode);
 			for(Creneau c : creneaux) {
