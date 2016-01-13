@@ -1,17 +1,25 @@
+import javax.management.relation.Role;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class CSVParser {
 
-    public void readEnseignants(int periodesParJour) {
-        Map<String, Map<Integer, Boolean>> enseignants;
-        String donnees = "C:/Users/hvallee/Documents/POSSICAT/POSSICAT/data/donneesLite.csv";
-        String contraintesEns = "C:/Users/hvallee/Documents/POSSICAT/POSSICAT/data/contraintesEnsLite.csv";
-        String contraintesTut = "C:/Users/hvallee/Documents/POSSICAT/POSSICAT/data/contraintesTuteurLite.csv";
+    public void readDispo(Role r, ListActeur acteurs, int periodesParJour) {
+        
+        String donnees;
+        if(r == Role.Enseignant) {
+        	donnees = "C:/Users/hvallee/Documents/POSSICAT/POSSICAT/data/contraintesEnsLite.csv";
+        } else {
+        	donnees = "C:/Users/hvallee/Documents/POSSICAT/POSSICAT/data/contraintesTuteurLite.csv";
+        }
+       
 
         BufferedReader br = null;
         String line = "";
@@ -19,21 +27,21 @@ public class CSVParser {
 
         try {
 
-            br = new BufferedReader(new FileReader(contraintesEns));
-            enseignants = new HashMap<>();
+            br = new BufferedReader(new FileReader(donnees));
             while ((line = br.readLine()) != null) {
                 // use comma as separator
-                String[] enseignant = line.split(cvsSplitBy);
-                if(!enseignant[0].equals("")) {
+            	line += " ";
+                String[] row = line.split(cvsSplitBy);
+                if(!row[0].equals("")) {
                     Map<Integer, Boolean> contraintes = new HashMap<>();
                     int periodeEnCours = 0;
-                    for(int i = 1; i < enseignant.length; i++) {
+                    for(int i = 1; i < row.length; i++) {
                         for(int j = 0; j < periodesParJour; j++) {
 
-                            if(enseignant[i].equals("X")) {
+                            if(row[i].contains("X")) {
                                 contraintes.put(periodeEnCours, true);
                             }
-                            else if(enseignant[i].equals("M")){
+                            else if(row[i].contains("M")){
                                 if(j <= periodesParJour/2 -1) {
                                     contraintes.put(periodeEnCours, true);
                                 }
@@ -41,7 +49,7 @@ public class CSVParser {
                                     contraintes.put(periodeEnCours, false);
                                 }
                             }
-                            else if(enseignant[i].equals("AM")){
+                            else if(row[i].contains("AM")){
                                 if(j > periodesParJour/2 -1) {
                                     contraintes.put(periodeEnCours, true);
                                 }
@@ -55,11 +63,20 @@ public class CSVParser {
                             periodeEnCours++;
                         }
                     }
-                    enseignants.put(enseignant[0], contraintes);
+                    
+            		
+                    Acteur a = null;
+                    if(r == Role.Enseignant) {
+                    	a = new Enseignant(row[0]);
+                    }
+                    if(r == Role.Tuteur) {
+                    	a = new Tuteur(row[0]);
+                    }
+                    a.setDisponibilites(contraintes);
+                    acteurs.list.add(a);
                 }
 
             }
-            System.out.print(enseignants);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -73,8 +90,61 @@ public class CSVParser {
                 }
             }
         }
-
-        System.out.println("Done");
     }
+
+	/**
+	 * @param enseignants
+	 * @param tuteurs
+	 * @param nbSoutenancesEnseignants
+	 * @param nbSoutenancesTuteurs
+	 * @param relationsEnseignants
+	 * @param relationsTuteurs
+	 * @param N
+	 */
+	public int readCSV(ListActeur enseignants, ListActeur tuteurs, int N) {
+        
+        String donnees= "C:/Users/hvallee/Documents/POSSICAT/POSSICAT/data/donneesLite.csv";
+
+        BufferedReader br = null;
+        String line = "";
+        String cvsSplitBy = ",";
+        int nbSoutenance = 0;
+        
+        try {
+
+            br = new BufferedReader(new FileReader(donnees));
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                // use comma as separator
+                String[] row = line.split(cvsSplitBy);
+                String ens_name = row[4];
+                String tut_name = row[5];
+                
+                Enseignant e = (Enseignant)enseignants.get(ens_name);
+                e.incNbSoutenances();
+                e.incNbSoutenancesCandide();
+                e.addRelation(tuteurs.get(tut_name));
+                
+                Tuteur t = (Tuteur)tuteurs.get(tut_name);
+                t.incNbSoutenances();
+                t.addRelation(enseignants.get(ens_name));
+                nbSoutenance++;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+		
+        return nbSoutenance;
+	}
 
 }
