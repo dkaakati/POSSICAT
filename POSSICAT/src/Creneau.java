@@ -7,15 +7,18 @@
  * @date 7 janv. 2016
  */
 public class Creneau {
-	Enseignant enseignant;
-	Enseignant candide;
-	Tuteur tuteur;
-	int periode;
-	public Creneau(int periode, Enseignant e, Enseignant c, Tuteur t) {
+	private Enseignant enseignant;
+	private Enseignant candide;
+	private Tuteur tuteur;
+	private Student student;
+	private int periode;
+	
+	public Creneau(int periode, Enseignant e, Enseignant c, Tuteur t, Student s) {
 		this.periode = periode;
 		this.enseignant = e;
 		this.tuteur = t;
 		this.candide = c;
+		this.student = s;
 	}
 	public Enseignant getEnseignant() {
 		return enseignant;
@@ -41,4 +44,15 @@ public class Creneau {
 	public void setPeriode(int periode) {
 		this.periode = periode;
 	}
+	public Student getStudent() {
+		return student;
+	}
+	public void setStudent(Student student) {
+		this.student = student;
+	}
+	
+	public String toString() {
+		return this.periode + " " + this.enseignant + " " + this.tuteur + " " + this.candide + " " + this.student;
+	}
+	
 }

@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,18 +12,19 @@ public class Planning {
 	int N, E, T, S;
 	boolean isFinised = false;
 	int nbInserted = 0;
-	int log = 1;
+	int log = 0;
 	
 	ListActeur enseignants = new ListActeur();
 	ListActeur tuteurs = new ListActeur();
+	List<Student> etudiants = new ArrayList<Student>();
 	Map<Integer, List<Creneau>> planning;
 	
 
-	public Planning() {
+	public Planning() throws IOException {
 		readCSV();
 	};
 
-	public void readCSV() {
+	public void readCSV() throws IOException {
 		
 		N = 8*5;
 		
@@ -42,17 +44,17 @@ public class Planning {
 			System.err.println(tuteurs.list.size() + " tuteurs");
 		}
 
-		int nbSoutenance = parser.readCSV(enseignants, tuteurs, N);
+		int nbSoutenance = parser.readCSV(enseignants, tuteurs, etudiants, N);
 		if(log==0) {
 			System.err.println(nbSoutenance + " soutenances");
+			System.err.println(etudiants);
 		}
-		
-		
-	
 
 		for(int i = 0; i < nbSoutenance; i++) {
 			insertData();
 		}
+		
+		parser.writeData(planning);
 		
 	}
 	
@@ -70,7 +72,6 @@ public class Planning {
 		} else {
 			t = (Tuteur)act;
 		}
-		System.err.println("Acteur le moins disponible : " + act);
 		if(log==0) {
 			System.err.println("");
 			System.err.println("On récupère les acteurs en relations les moins disponibles");
@@ -102,7 +103,8 @@ public class Planning {
 				System.err.println("Acteur " + act);
 				System.err.println("Tuteur " + t);
 			}
-			Creneau c = creneauCommun(e, t);
+			Student s = getStudent(e, t);
+			Creneau c = creneauCommun(e, t, s);
 			if(log==0) {
 				System.err.println(c);
 			}
@@ -110,8 +112,10 @@ public class Planning {
 				l.list.remove(act);
 			} else {
 				inserted = true;
+				
 				if(log==0 || log==1) {
 					System.err.println(nbInserted + "\n-----------------");
+					System.err.println("\tEtudiant " + c.getStudent());
 					System.err.println("\tEnseignant " + c.getEnseignant());
 					System.err.println("\tTuteur " + c.getTuteur());
 					System.err.println("\tCandide " + c.getCandide());
@@ -151,6 +155,16 @@ public class Planning {
 		}
 	}
 	
+	private Student getStudent(Enseignant e, Tuteur t) {
+		for(Student s : etudiants) {
+			if(s.getEnseignant() == e && s.getTuteur() == t) {
+				etudiants.remove(s);
+				return s;
+			}
+		}
+		return null;
+	}
+
 	public Acteur getActeurLeMoinsDisponible() {
 		
 		Acteur e = enseignants.getActeurLeMoinsDisponible();
@@ -163,7 +177,7 @@ public class Planning {
 		}
 	}
 	
-	public Creneau creneauCommun(Enseignant e, Tuteur t) {
+	public Creneau creneauCommun(Enseignant e, Tuteur t, Student s) {
 		if(log==0) {
 			System.err.println(e + " " + t);
 		}
@@ -210,7 +224,7 @@ public class Planning {
 			}
 			for(int periode : creneauxCommuns) {
 				if(c.getDisponibilites().get(periode)) {
-					return new Creneau(periode, e, c, t);
+					return new Creneau(periode, e, c, t, s);
 				}
 			}
 			listeCandide.remove(c);
