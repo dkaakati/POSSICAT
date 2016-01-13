@@ -182,6 +182,9 @@ public class CSVParser {
 							+ c.getEnseignant() + ","
 							+ c.getCandide() + ", ,");
 			}
+			if(creneaux.size()==1) {
+				sb.append(",,,,,");
+			}
 			sb.append("\n");
 		}
 		System.out.println(sb.toString());
