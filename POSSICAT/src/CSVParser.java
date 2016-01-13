@@ -26,7 +26,7 @@ public class CSVParser {
 
         BufferedReader br = null;
         String line = "";
-        String cvsSplitBy = ";";
+        String cvsSplitBy = ",";
 
         try {
 
@@ -111,7 +111,7 @@ public class CSVParser {
 
         BufferedReader br = null;
         String line = "";
-        String cvsSplitBy = ";";
+        String cvsSplitBy = ",";
         int nbSoutenance = 0;
         
         try {
@@ -169,18 +169,18 @@ public class CSVParser {
 		Set<Integer> periodes = planning.keySet();
 		for(int periode : periodes) {
 			if(periode%8==0) {
-				sb.append("\n\n\"JOUR " + ((periode/8)+1) + "\"\n");
-				sb.append(";\"SALLE 0\";;;;;\"SALLE1\"\n");
+				sb.append("\n\nJOUR " + ((periode/8)+1) + "\n");
+				sb.append(",SALLE 0,,,,,SALLE1\n");
 			}
 			List<Creneau> creneaux = planning.get(periode);
 			for(Creneau c : creneaux) {
 					if(c.getSalle()==1) {
-						sb.append("\"" + c.getHoraire() + "\";");
+						sb.append(c.getHoraire() + ",");
 					}
-					sb.append("\"" + c.getStudent() + "\";\""
-							+ c.getTuteur() + "\";\""
-							+ c.getEnseignant() + "\";\""
-							+ c.getCandide() + "\"; ;");
+					sb.append(c.getStudent() + ","
+							+ c.getTuteur() + ","
+							+ c.getEnseignant() + ","
+							+ c.getCandide() + ", ,");
 			}
 			sb.append("\n");
 		}
