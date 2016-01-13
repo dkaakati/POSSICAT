@@ -68,7 +68,7 @@ public class Planning {
 		//System.err.println("On récupère les acteurs en relations les moins disponibles");
 		
 		ListActeur l = new ListActeur(act.getRelations());
-		//System.err.println("Liste des acteurs en relation " + l);
+		//System.err.println("Liste des acteurs en relation avec " + act + " => " + l);
 		
 		while(!inserted) {
 			//System.err.println(l);

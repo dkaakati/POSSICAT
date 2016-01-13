@@ -18,7 +18,7 @@ public class ListActeur {
 		list = new ArrayList<Acteur>();
 	}
 	
-	public ListActeur(Set<Acteur> l) {
+	public ListActeur(List<Acteur> l) {
 		this.list = new ArrayList<Acteur>(l);
 	}
 

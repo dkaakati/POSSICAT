@@ -16,13 +16,13 @@ public abstract class Acteur {
 	
 	Map<Integer, Boolean> disponibilites;
 	int nbSoutenances;
-	Set<Acteur> relations;
+	List<Acteur> relations;
 	String name;
 	
 	public Acteur(String name) {
 		this.name = name;
 		nbSoutenances = 0;
-		relations = new HashSet<Acteur>();
+		relations = new ArrayList<Acteur>();
 	}
 
 	public Map<Integer, Boolean> getDisponibilites() {
@@ -46,7 +46,7 @@ public abstract class Acteur {
 		this.nbSoutenances = nbSoutenances;
 	}
 
-	public Set<Acteur> getRelations() {
+	public List<Acteur> getRelations() {
 		return relations;
 	}
 	
@@ -58,7 +58,7 @@ public abstract class Acteur {
 		this.relations.remove(a);
 	}
 
-	public void setRelations(Set<Acteur> relations) {
+	public void setRelations(List<Acteur> relations) {
 		this.relations = relations;
 	}
 

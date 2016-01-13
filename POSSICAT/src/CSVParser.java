@@ -14,15 +14,15 @@ public class CSVParser {
         
         String donnees;
         if(r == Role.Enseignant) {
-        	donnees = "data/contraintesEnsLite.csv";
+        	donnees = "data/contraintesEnsLite2.csv";
         } else {
-        	donnees = "data/contraintesTuteurLite.csv";
+        	donnees = "data/contraintesTuteurLite2.csv";
         }
        
 
         BufferedReader br = null;
         String line = "";
-        String cvsSplitBy = ",";
+        String cvsSplitBy = ";";
 
         try {
 
@@ -102,11 +102,11 @@ public class CSVParser {
 	 */
 	public int readCSV(ListActeur enseignants, ListActeur tuteurs, int N) {
         
-        String donnees= "data/donneesLite.csv";
+        String donnees= "data/donneesLite2.csv";
 
         BufferedReader br = null;
         String line = "";
-        String cvsSplitBy = ",";
+        String cvsSplitBy = ";";
         int nbSoutenance = 0;
         
         try {
