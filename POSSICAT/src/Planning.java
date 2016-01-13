@@ -11,6 +11,7 @@ public class Planning {
 	int N, E, T, S;
 	boolean isFinised = false;
 	int nbInserted = 0;
+	int log = 1;
 	
 	ListActeur enseignants = new ListActeur();
 	ListActeur tuteurs = new ListActeur();
@@ -36,11 +37,15 @@ public class Planning {
 		CSVParser parser = new CSVParser();
 		parser.readDispo(Role.Enseignant, enseignants, 8);
 		parser.readDispo(Role.Tuteur, tuteurs, 8);
-		//System.err.println(enseignants.list.size() + " enseignants");
-		//System.err.println(tuteurs.list.size() + " tuteurs");
+		if(log==0) {
+			System.err.println(enseignants.list.size() + " enseignants");
+			System.err.println(tuteurs.list.size() + " tuteurs");
+		}
 
 		int nbSoutenance = parser.readCSV(enseignants, tuteurs, N);
-		//System.err.println(nbSoutenance + " soutenances");
+		if(log==0) {
+			System.err.println(nbSoutenance + " soutenances");
+		}
 		
 		
 	
@@ -54,7 +59,9 @@ public class Planning {
 	public void insertData() {
 		boolean inserted = false;
 		
-		//System.err.println("On récupère l'acteur le moins disponible (enseignant ou tuteur)");
+		if(log==0) {
+			System.err.println("On récupère l'acteur le moins disponible (enseignant ou tuteur)");
+		}
 		Acteur act = getActeurLeMoinsDisponible();
 		Enseignant e = null;
 		Tuteur t = null;
@@ -63,31 +70,53 @@ public class Planning {
 		} else {
 			t = (Tuteur)act;
 		}
-		//System.err.println("Acteur le moins disponible : " + act);
-		//System.err.println("");
-		//System.err.println("On récupère les acteurs en relations les moins disponibles");
+		System.err.println("Acteur le moins disponible : " + act);
+		if(log==0) {
+			System.err.println("");
+			System.err.println("On récupère les acteurs en relations les moins disponibles");
+		}
 		
 		ListActeur l = new ListActeur(act.getRelations());
-		//System.err.println("Liste des acteurs en relation avec " + act + " => " + l);
+		if(log==0) {
+			System.err.println("Liste des acteurs en relation avec " + act + " => " + l);
+		}
 		
 		while(!inserted) {
-			//System.err.println(l);
+			if(l.list.isEmpty()) {
+				if(log==0) {
+					System.err.println("On génère une exception");
+				}
+				new Exception("On génère une exception");
+			}
+			
 			act = l.getActeurLeMoinsDisponible();
+			if(log==0) {
+				System.err.println("On teste avec " + act);
+			}
 			if(act instanceof Enseignant) {
 				e = (Enseignant)act;
 			} else {
 				t = (Tuteur)act;
 			}
+			if(log==0) {
+				System.err.println("Acteur " + act);
+				System.err.println("Tuteur " + t);
+			}
 			Creneau c = creneauCommun(e, t);
+			if(log==0) {
+				System.err.println(c);
+			}
 			if(c==null) {
 				l.list.remove(act);
 			} else {
 				inserted = true;
-				System.err.println(nbInserted + "\n-----------------");
-				System.err.println("\tEnseignant " + c.getEnseignant());
-				System.err.println("\tTuteur " + c.getTuteur());
-				System.err.println("\tCandide " + c.getCandide());
-				System.err.println("\tA la période " + c.getPeriode());
+				if(log==0 || log==1) {
+					System.err.println(nbInserted + "\n-----------------");
+					System.err.println("\tEnseignant " + c.getEnseignant());
+					System.err.println("\tTuteur " + c.getTuteur());
+					System.err.println("\tCandide " + c.getCandide());
+					System.err.println("\tA la période " + c.getPeriode());
+				}
 				
 				e.addDisponibilite(c.getPeriode());
 				t.addDisponibilite(c.getPeriode());
@@ -135,7 +164,9 @@ public class Planning {
 	}
 	
 	public Creneau creneauCommun(Enseignant e, Tuteur t) {
-		//System.err.println(e + " " + t);
+		if(log==0) {
+			System.err.println(e + " " + t);
+		}
 		Map<Integer, Boolean> dispoEnseignant = e.getDisponibilites();
 		Map<Integer, Boolean> dispoTuteur = t.getDisponibilites();
 		
@@ -152,13 +183,24 @@ public class Planning {
 			}
 		}
 		
-		//System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxCommuns);
+		if(log==0) {
+			System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxCommuns);
+		}
+		
+		if(creneauxCommuns.isEmpty()) {
+			return null;
+		}
 		
 		Set<Acteur> listeCandide = new HashSet<Acteur>(enseignants.list);
 		listeCandide.remove(e);
 		Enseignant c = null;
 		
+		if(log==0) {
+			System.err.println(listeCandide);
+		}
+		
 		while(!listeCandide.isEmpty()) {
+			
 			for(Acteur act: listeCandide) {
 				Enseignant a = (Enseignant)act;
 				// On récupère le candide a qui il reste le plus de soutenances a voir
@@ -172,6 +214,7 @@ public class Planning {
 				}
 			}
 			listeCandide.remove(c);
+			c = null;
 		}
 
 		return null;
