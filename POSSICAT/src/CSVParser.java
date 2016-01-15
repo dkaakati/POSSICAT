@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javafx.collections.ObservableList;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
@@ -148,15 +150,20 @@ public class CSVParser {
 
 	/**
 	 * @param planning
+	 * @param sallesSelectionnees 
 	 * @throws IOException 
 	 */
-	public void writeData(Map<Integer, List<Creneau>> planning) throws IOException {
+	public void writeData(Map<Integer, List<Creneau>> planning, ObservableList<String> sallesSelectionnees) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		Set<Integer> periodes = planning.keySet();
 		sb.append("sep=,\n");
 		for(int periode : periodes) {
 			if(periode%8==0) {
-				sb.append(",,,,,,,,,,,\nJOUR " + ((periode/8)+1) + ",SALLE 0,,,,,SALLE1,,,,,\n");
+				sb.append(",,,,,,,,,,,\nJOUR " + ((periode/8)+1) + ",");
+				for(String salle : sallesSelectionnees) {
+					sb.append(salle + ",,,,,");
+				}
+				sb.append("\n");
 			}
 			List<Creneau> creneaux = planning.get(periode);
 			for(Creneau c : creneaux) {

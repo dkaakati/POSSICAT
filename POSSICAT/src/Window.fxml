@@ -26,11 +26,11 @@
                </image>
             </ImageView>
             <Button layoutX="315.0" layoutY="28.0" mnemonicParsing="false" text="?" textOverrun="LEADING_ELLIPSIS" />
-            <Button fx:id="generateBtn" layoutX="536.0" layoutY="212.0" mnemonicParsing="false" onAction="#readCSV" text="Générer Planning" />
+            <Button fx:id="generateBtn" layoutX="509.0" layoutY="279.0" mnemonicParsing="false" onAction="#readCSV" text="Générer Planning" />
             <Button layoutX="308.0" layoutY="165.0" mnemonicParsing="false" text="?" textOverrun="LEADING_ELLIPSIS" />
             <ImageView fitHeight="42.0" fitWidth="55.0" layoutX="37.0" layoutY="179.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../res/one.png" />
+                  <Image url="@../res/two.png" />
                </image>
             </ImageView>
             <Separator layoutX="57.0" layoutY="262.0" prefHeight="16.0" prefWidth="312.0" />
@@ -39,12 +39,17 @@
             <Button layoutX="317.0" layoutY="312.0" mnemonicParsing="false" text="?" textOverrun="LEADING_ELLIPSIS" />
             <ImageView fitHeight="42.0" fitWidth="55.0" layoutX="46.0" layoutY="326.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../res/one.png" />
+                  <Image url="@../res/three.png" />
                </image>
             </ImageView>
             <Separator layoutX="62.0" layoutY="391.0" prefHeight="16.0" prefWidth="312.0" />
             <Text layoutX="121.0" layoutY="330.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Importer votre jeu de données" />
             <Button fx:id="openBtn3" layoutX="115.0" layoutY="347.0" mnemonicParsing="false" onAction="#openContraintesTut" text="Import CSV" />
+            <AnchorPane layoutX="425.0" layoutY="20.0" prefHeight="200.0" prefWidth="246.0">
+               <children>
+                  <ListView fx:id="listSalles" prefHeight="101.0" prefWidth="252.0" />
+               </children>
+            </AnchorPane>
          </children>
     </AnchorPane>
   </children>

@@ -4,19 +4,20 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import com.sun.javafx.logging.Logger;
-
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -28,6 +29,12 @@ public class Planning implements Initializable {
 	boolean isFinised = false;
 	int nbInserted = 0;
 	int log = 2;
+	
+	@FXML
+	private ListView listSalles;
+	
+	protected ListProperty<String> listProperty = new SimpleListProperty<>();
+	protected List<String> salles = new ArrayList<>();
 	
 	ListActeur enseignants = new ListActeur();
 	ListActeur tuteurs = new ListActeur();
@@ -49,14 +56,14 @@ public class Planning implements Initializable {
 	};
 
 	public void readCSV() throws IOException {
+		ObservableList<String> sallesSelectionnees = listSalles.getSelectionModel().getSelectedItems();
+		S = sallesSelectionnees.size();
 		
 		N = 8*5;
 		
 		planning = new HashMap<Integer, List<Creneau>>();
 		for(int periode = 0; periode < N ; periode++) {
 			List<Creneau> salles = new ArrayList<Creneau>();
-			//salles.add(null);
-			//salles.add(null);
 			planning.put(periode, salles);
 		}
 		
@@ -78,7 +85,7 @@ public class Planning implements Initializable {
 			insertData();
 		}
 		
-		parser.writeData(planning);
+		parser.writeData(planning, sallesSelectionnees);
 		desktop.open(new File(System.getProperty("user.dir") + "/data/output.csv"));
 		
 		
@@ -176,15 +183,8 @@ public class Planning implements Initializable {
 		List<Creneau> salles = planning.get(c.getPeriode());
 		
 		int size = salles.size();
-		if(size == 0) {
-			c.setSalle(1);
-			salles.add(c);
-		} else if(size == 1) {
-			c.setSalle(2);
-			salles.add(c);
-		} else {
-			new Exception("Plus de salles disponibles");
-		}
+		c.setSalle(size+1);
+		salles.add(c);
 	}
 
 	private Student getStudent(Enseignant e, Tuteur t) {
@@ -258,7 +258,7 @@ public class Planning implements Initializable {
 				if(c.getDisponibilites().get(periode)) {
 					// Vérifier si une salle est disponible
 					System.err.println("SALLES DISPO " + planning.get(periode).size());
-					if(planning.get(periode).size()<2) {
+					if(planning.get(periode).size()<S) {
 						return new Creneau(periode, e, c, t, s);
 					}
 				}
@@ -275,10 +275,18 @@ public class Planning implements Initializable {
 	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		
+		salles.add("i50");
+		salles.add("i51");
+		salles.add("Jersey");
+		salles.add("Genersey");
+		listSalles.itemsProperty().bind(listProperty);
+		listSalles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		listProperty.set(FXCollections.observableArrayList(salles));
 	}
 	
 	public void openJeuDonnees() {
+			
+		System.err.println(listSalles.getItems());
 		File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             System.err.println(file.getAbsolutePath());
