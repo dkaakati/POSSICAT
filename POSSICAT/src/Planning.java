@@ -27,12 +27,16 @@ public class Planning implements Initializable {
 	int N, E, T, S;
 	boolean isFinised = false;
 	int nbInserted = 0;
-	int log = 0;
+	int log = 2;
 	
 	ListActeur enseignants = new ListActeur();
 	ListActeur tuteurs = new ListActeur();
 	List<Student> etudiants = new ArrayList<Student>();
 	Map<Integer, List<Creneau>> planning;
+	
+	private String pathDonnees = "";
+	private String pathContraintesEns = "";
+	private String pathContraintesTut = "";
 	
 	private Stage stage;
 	private Desktop desktop = Desktop.getDesktop();
@@ -42,7 +46,6 @@ public class Planning implements Initializable {
 
 	public Planning(Stage primaryStage) throws IOException {
 		this.stage = primaryStage;
-		//readCSV();
 	};
 
 	public void readCSV() throws IOException {
@@ -58,14 +61,14 @@ public class Planning implements Initializable {
 		}
 		
 		CSVParser parser = new CSVParser();
-		parser.readDispo(Role.Enseignant, enseignants, 8);
-		parser.readDispo(Role.Tuteur, tuteurs, 8);
+		parser.readDispo(pathContraintesEns, Role.Enseignant, enseignants, 8);
+		parser.readDispo(pathContraintesTut, Role.Tuteur, tuteurs, 8);
 		if(log==0) {
 			System.err.println(enseignants.list.size() + " enseignants");
 			System.err.println(tuteurs.list.size() + " tuteurs");
 		}
 
-		int nbSoutenance = parser.readCSV(enseignants, tuteurs, etudiants, N);
+		int nbSoutenance = parser.readCSV(pathDonnees, enseignants, tuteurs, etudiants, N);
 		if(log==0) {
 			System.err.println(nbSoutenance + " soutenances");
 			System.err.println(etudiants);
@@ -76,6 +79,8 @@ public class Planning implements Initializable {
 		}
 		
 		parser.writeData(planning);
+		desktop.open(new File(System.getProperty("user.dir") + "/data/output.csv"));
+		
 		
 	}
 	
@@ -232,7 +237,7 @@ public class Planning implements Initializable {
 			return null;
 		}
 		
-		Set<Acteur> listeCandide = new HashSet<Acteur>(enseignants.list);
+		List<Acteur> listeCandide = new ArrayList<Acteur>(enseignants.list);
 		listeCandide.remove(e);
 		Enseignant c = null;
 		
@@ -276,32 +281,25 @@ public class Planning implements Initializable {
 	public void openJeuDonnees() {
 		File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-            openFile(file);
             System.err.println(file.getAbsolutePath());
+            pathDonnees = file.getAbsolutePath();
         }
 	}
 	
 	public void openContraintesEns() {
 		File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-            openFile(file);
             System.err.println(file.getAbsolutePath());
+            pathContraintesEns = file.getAbsolutePath();
         }
 	}
 	
 	public void openContraintesTut() {
 		File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-            openFile(file);
             System.err.println(file.getAbsolutePath());
+            pathContraintesTut = file.getAbsolutePath();
         }
 	}
 	
-	private void openFile(File file) {
-        /*try {
-            //desktop.open(file);
-        } catch (IOException ex) {
-
-        }*/
-    }
 }

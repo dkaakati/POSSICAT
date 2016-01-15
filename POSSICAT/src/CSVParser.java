@@ -14,15 +14,7 @@ import com.google.common.io.Files;
 
 public class CSVParser {
 
-    public void readDispo(Role r, ListActeur acteurs, int periodesParJour) {
-        
-        String donnees;
-        if(r == Role.Enseignant) {
-        	donnees = "data/contraintesEnsLite2.csv";
-        } else {
-        	donnees = "data/contraintesTuteurLite2.csv";
-        }
-       
+    public void readDispo(String donnees, Role r, ListActeur acteurs, int periodesParJour) {
 
         BufferedReader br = null;
         String line = "";
@@ -96,6 +88,7 @@ public class CSVParser {
     }
 
 	/**
+	 * @param donnees 
 	 * @param enseignants
 	 * @param tuteurs
 	 * @param etudiants 
@@ -105,9 +98,7 @@ public class CSVParser {
 	 * @param relationsTuteurs
 	 * @param N
 	 */
-	public int readCSV(ListActeur enseignants, ListActeur tuteurs, List<Student> etudiants, int N) {
-        
-        String donnees= "data/donneesLite2.csv";
+	public int readCSV(String donnees, ListActeur enseignants, ListActeur tuteurs, List<Student> etudiants, int N) {
 
         BufferedReader br = null;
         String line = "";
@@ -160,13 +151,9 @@ public class CSVParser {
 	 * @throws IOException 
 	 */
 	public void writeData(Map<Integer, List<Creneau>> planning) throws IOException {
-		/*StringBuilder sb = new StringBuilder("Période" + ";" 
-				+ "Etudiant" + ";"
-				+ "Tuteur" + ";"
-				+ "Enseignant" + ";"
-				+ "Candide" + "\n");*/
 		StringBuilder sb = new StringBuilder();
 		Set<Integer> periodes = planning.keySet();
+		sb.append("sep=,\n");
 		for(int periode : periodes) {
 			if(periode%8==0) {
 				sb.append(",,,,,,,,,,,\nJOUR " + ((periode/8)+1) + ",SALLE 0,,,,,SALLE1,,,,,\n");
