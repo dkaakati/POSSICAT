@@ -1,50 +1,50 @@
-Etudiant;NOM;Prenom;Entreprise + lieu;Enseignant-Encadrant;Tuteur-Entreprise
- laurent.marjot@univ-rennes1.fr;MARJOT ;Laurent;Sogeti (Rennes);francois.poulet@univ-rennes1.fr;Alain Deux
- mario.levallois@univ-rennes1.fr;LEVALLOIS;Mario;Infotel (Rennes);didier.certain@univ-rennes1.fr;Alex Andre
- neven.moguerou@univ-rennes1.fr;MOGUEROU;Neven;Thomson (Rennes);didier.certain@univ-rennes1.fr;Ali Burton
- cyril.rotard@univ-rennes1.fr;ROTARD;Cyril;Atos (Rennes);sebastien.ferre@univ-rennes1.fr;All Right
- jean-francois.rethiers@univ-rennes1.fr;RETHIERS;Jean-Franeois;Sopra (Rennes);charles.queguiner@univ-rennes1.fr;Anne de Bretagne
- gaetan/longuet@univ-rennes1.fr;LONGUET ;Gaetan;Sopra (Rennes);gilles.lesventes@univ-rennes1.fr;Anne de Bretagne
- julien.herrero@univ-rennes1.fr;HERRERO;Julien;Capgemini (Rennes);francois.poulet@univ-rennes1.fr;Ariane Mnouchkine
- charly.maupetit@univ-rennes1.fr;MAUPETIT;Charly;Capgemini (Rennes);gilles.lesventes@univ-rennes1.fr;Ariane Mnouchkine
- damein.fremont@univ-rennes1.fr;FREMONT;Damien;Capgemini (Rennes);mickael.foursov@univ-rennes1.fr;Ariane Mnouchkine
- corentin.simon@univ-rennes1.fr;SIMON;Corentin;Capgemini (Rennes);sebastien.ferre@univ-rennes1.fr;Ariane Mnouchkine
-antoine.ameline@univ-rennes1.fr;AMELINE;Antoine;Paramount (Los Angeles);didier.certain@univ-rennes1.fr;Bill Doors
- pierre-anthime.harasse@univ-rennes1.fr;HARASSE;Pierre-Anthime;Alyotech (Rennes);mathieu.acher@univ-rennes1.fr;Carlos Bedran
- pierre-olivier.brindjonc@univ-rennes1.fr;BRINDJONC;Pierre-Olivier;Keyrus (Rennes);didier.certain@univ-rennes1.fr;Eric Cohen
- clement.brief@univ-rennes1.fr;BRIEF;Clement;Sopra (Rennes);didier.certain@univ-rennes1.fr;Eric Freliger
- guillaume.lefranc@univ-rennes1.fr;LEFRANC;Guillaume;Sopra (Rennes);didier.certain@univ-rennes1.fr;Eric Freliger
- guillaume.yan@univ-rennes1.fr;YAN;Guillaume;Sopra (Rennes);gilles.lesventes@univ-rennes1.fr;Eric Freliger
- kevin.brault@univ-rennes1.fr;BRAULT;Kevin ;Sopra (Rennes);sebastien.ferre@univ-rennes1.fr;Eric Freliger
-elodie.poince@univ-rennes1.fr;POINCE ;Elodie;Sopra (Rennes);sebastien.ferre@univ-rennes1.fr;Eric Freliger
- francois.morvan@univ-rennes1.fr;MORVAN;Franeois;CGI (Rennes);charles.queguiner@univ-rennes1.fr;Fernando Capi
- sabrina.jeanne@univ-rennes1.fr;JEANNE;Sabrina;Niji (Rennes);mickael.foursov@univ-rennes1.fr;Hugues Meili
- flavien.simon@univ-rennes1.fr;SIMON;Flavien;Niji (Rennes);mickael.foursov@univ-rennes1.fr;Hugues Meili
- alvine.grellier@univ-rennes1.fr;GRELLIER;Alvine;La Cie Hyperactive (Niort);didier.certain@univ-rennes1.fr;Jacques Bond
- chaolei.li@univ-rennes1.fr;LI;Chaolei;Ubikod (Rennes);didier.certain@univ-rennes1.fr;James Lire
- yaelle.echivard@univ-rennes1.fr;ECHIVARD;Yaelle;B & D (Paris);marc.bousse@univ-rennes1.fr;Jean Tonne
-tristan.bouchard@univ-rennes1.fr;BOUCHARD;Tristan;ASI (Nantes);didier.certain@univ-rennes1.fr;Jean-Paul Chapron
-clement.roulland@univ-rennes1.fr;ROULLAND;Clement;Digitaleo (Bruz);mathieu.acher@univ-rennes1.fr;Jocelyn Denis
- simon.dreau@univ-rennes1.fr;DREAU ;Simon;CGI (Bordeaux);didier.certain@univ-rennes1.fr;Michael Roach
- jean-baptiste.le-vot@univ-rennes1.fr;LE VOT;Jean-Baptiste;CGI (Rennes);didier.certain@univ-rennes1.fr;Michael Roach
- vincent.ecorchard@univ-rennes1.fr;ECORCHARD;Vincent;CGI (Rennes);Finn.Jorgensen@univ-rennes1.fr;Michael Roach
- alexis.le-glaunec@univ-rennes1.fr;LE GLAUNEC;Alexis;B & D (Nantes);mickael.foursov@univ-rennes1.fr;Patrick Bensabat
- jean-baptiste.oger@univ-rennes1.fr;OGER;Jean-Baptiste;B & D (Nantes);mickael.foursov@univ-rennes1.fr;Patrick Bensabat
- amandine.paris@univ-rennes1.fr;PARIS ;Amandine;B & D (Nantes);mickael.foursov@univ-rennes1.fr;Patrick Bensabat
- nicolas.prigent@univ-rennes1.fr;PRIGENT;Nicolas ;Sogeti (Rennes);sebastien.ferre@univ-rennes1.fr;Pedro Almodo
- yann.ritter@univ-rennes1.fr;RITTER;Yann;Capgemini (Nantes);marc.bousse@univ-rennes1.fr;Pitt de Witt
- valentin.rossi@univ-rennes1.fr;ROSSI;Valentin;Actedev (St Malo);didier.certain@univ-rennes1.fr;Roland Sailor
- mathilde.guillossou@univ-rennes1.fr;GUILLOSSOU;Mathilde;SmartSoft (Bangkok);didier.certain@univ-rennes1.fr;Saranaya Kim
-ramona.bejan@univ-rennes1.fr;BEJAN;Ramona;Capgemini (Rennes);charles.queguiner@univ-rennes1.fr;Serge Kampf
-marine.binguer-moizan@univ-rennes1.fr;BINIGUER-MOIZAN;Marine;Capgemini (Rennes);gilles.lesventes@univ-rennes1.fr;Serge Kampf
- enzo.ferreni@univ-rennes1.fr;FERRENI;Enzo;Capgemini (Rennes);mickael.foursov@univ-rennes1.fr;Serge Kampf
- amelie.rychener@univ-rennes1.fr;RYCHENER;Amelie;Capgemini (Rennes);mickael.foursov@univ-rennes1.fr;Serge Kampf
- alexandre.douard@univ-rennes1.fr;DOUARD;Alexandre;Capgemini (Rennes);sebastien.ferre@univ-rennes1.fr;Serge Kampf
- fabien.marot@univ-rennes1.fr;MAROT;Fabien;Capgemini (Rennes);sebastien.ferre@univ-rennes1.fr;Serge Kampf
- paul-alain.fokam-tamdem@univ-rennes1.fr;FOKAM TAMDEM;Paul-Alain;OBS (Rennes);francois.poulet@univ-rennes1.fr;Stephane Richard
- jean-michel.chaladyj@univ-rennes1.fr;CHALADYJ;Jean-Michel;OBS (Rennes);sebastien.ferre@univ-rennes1.fr;Stephane Richard
- thomas.le-naour@univ-rennes1.fr;LE NAOUR;Thomas;SII (Rennes);mathieu.acher@univ-rennes1.fr;Theo Reme
- cyril.cocherel@univ-rennes1.fr;COCHEREL;Cyril;Atos (Rennes);noel.plouzeau@univ-rennes1.fr;Thierry Breton
- anabella.ndabaneze@univ-rennes1.fr;NDABANEZE;Anabella;Atos (Rennes);sebastien.ferre@univ-rennes1.fr;Thierry Breton
- carla.tunqui-neira@univ-rennes1.fr;TUNQUI NEIRA;Carla;Capgemini (Rennes);sebastien.ferre@univ-rennes1.fr;Ulysse Hill
- andy.labbe@univ-rennes1.fr;LABBE;Andy;Steria (Nantes);marc.bousse@univ-rennes1.fr;Vincent Paris
+Etudiant,NOM,Prenom,Entreprise + lieu,Enseignant-Encadrant,Tuteur-Entreprise
+ laurent.marjot@univ-rennes1.fr,MARJOT ,Laurent,Sogeti (Rennes),francois.poulet@univ-rennes1.fr,Alain Deux
+ mario.levallois@univ-rennes1.fr,LEVALLOIS,Mario,Infotel (Rennes),didier.certain@univ-rennes1.fr,Alex Andre
+ neven.moguerou@univ-rennes1.fr,MOGUEROU,Neven,Thomson (Rennes),didier.certain@univ-rennes1.fr,Ali Burton
+ cyril.rotard@univ-rennes1.fr,ROTARD,Cyril,Atos (Rennes),sebastien.ferre@univ-rennes1.fr,All Right
+ jean-francois.rethiers@univ-rennes1.fr,RETHIERS,Jean-Franeois,Sopra (Rennes),charles.queguiner@univ-rennes1.fr,Anne de Bretagne
+ gaetan/longuet@univ-rennes1.fr,LONGUET ,Gaetan,Sopra (Rennes),gilles.lesventes@univ-rennes1.fr,Anne de Bretagne
+ julien.herrero@univ-rennes1.fr,HERRERO,Julien,Capgemini (Rennes),francois.poulet@univ-rennes1.fr,Ariane Mnouchkine
+ charly.maupetit@univ-rennes1.fr,MAUPETIT,Charly,Capgemini (Rennes),gilles.lesventes@univ-rennes1.fr,Ariane Mnouchkine
+ damein.fremont@univ-rennes1.fr,FREMONT,Damien,Capgemini (Rennes),mickael.foursov@univ-rennes1.fr,Ariane Mnouchkine
+ corentin.simon@univ-rennes1.fr,SIMON,Corentin,Capgemini (Rennes),sebastien.ferre@univ-rennes1.fr,Ariane Mnouchkine
+antoine.ameline@univ-rennes1.fr,AMELINE,Antoine,Paramount (Los Angeles),didier.certain@univ-rennes1.fr,Bill Doors
+ pierre-anthime.harasse@univ-rennes1.fr,HARASSE,Pierre-Anthime,Alyotech (Rennes),mathieu.acher@univ-rennes1.fr,Carlos Bedran
+ pierre-olivier.brindjonc@univ-rennes1.fr,BRINDJONC,Pierre-Olivier,Keyrus (Rennes),didier.certain@univ-rennes1.fr,Eric Cohen
+ clement.brief@univ-rennes1.fr,BRIEF,Clement,Sopra (Rennes),didier.certain@univ-rennes1.fr,Eric Freliger
+ guillaume.lefranc@univ-rennes1.fr,LEFRANC,Guillaume,Sopra (Rennes),didier.certain@univ-rennes1.fr,Eric Freliger
+ guillaume.yan@univ-rennes1.fr,YAN,Guillaume,Sopra (Rennes),gilles.lesventes@univ-rennes1.fr,Eric Freliger
+ kevin.brault@univ-rennes1.fr,BRAULT,Kevin ,Sopra (Rennes),sebastien.ferre@univ-rennes1.fr,Eric Freliger
+elodie.poince@univ-rennes1.fr,POINCE ,Elodie,Sopra (Rennes),sebastien.ferre@univ-rennes1.fr,Eric Freliger
+ francois.morvan@univ-rennes1.fr,MORVAN,Franeois,CGI (Rennes),charles.queguiner@univ-rennes1.fr,Fernando Capi
+ sabrina.jeanne@univ-rennes1.fr,JEANNE,Sabrina,Niji (Rennes),mickael.foursov@univ-rennes1.fr,Hugues Meili
+ flavien.simon@univ-rennes1.fr,SIMON,Flavien,Niji (Rennes),mickael.foursov@univ-rennes1.fr,Hugues Meili
+ alvine.grellier@univ-rennes1.fr,GRELLIER,Alvine,La Cie Hyperactive (Niort),didier.certain@univ-rennes1.fr,Jacques Bond
+ chaolei.li@univ-rennes1.fr,LI,Chaolei,Ubikod (Rennes),didier.certain@univ-rennes1.fr,James Lire
+ yaelle.echivard@univ-rennes1.fr,ECHIVARD,Yaelle,B & D (Paris),marc.bousse@univ-rennes1.fr,Jean Tonne
+tristan.bouchard@univ-rennes1.fr,BOUCHARD,Tristan,ASI (Nantes),didier.certain@univ-rennes1.fr,Jean-Paul Chapron
+clement.roulland@univ-rennes1.fr,ROULLAND,Clement,Digitaleo (Bruz),mathieu.acher@univ-rennes1.fr,Jocelyn Denis
+ simon.dreau@univ-rennes1.fr,DREAU ,Simon,CGI (Bordeaux),didier.certain@univ-rennes1.fr,Michael Roach
+ jean-baptiste.le-vot@univ-rennes1.fr,LE VOT,Jean-Baptiste,CGI (Rennes),didier.certain@univ-rennes1.fr,Michael Roach
+ vincent.ecorchard@univ-rennes1.fr,ECORCHARD,Vincent,CGI (Rennes),Finn.Jorgensen@univ-rennes1.fr,Michael Roach
+ alexis.le-glaunec@univ-rennes1.fr,LE GLAUNEC,Alexis,B & D (Nantes),mickael.foursov@univ-rennes1.fr,Patrick Bensabat
+ jean-baptiste.oger@univ-rennes1.fr,OGER,Jean-Baptiste,B & D (Nantes),mickael.foursov@univ-rennes1.fr,Patrick Bensabat
+ amandine.paris@univ-rennes1.fr,PARIS ,Amandine,B & D (Nantes),mickael.foursov@univ-rennes1.fr,Patrick Bensabat
+ nicolas.prigent@univ-rennes1.fr,PRIGENT,Nicolas ,Sogeti (Rennes),sebastien.ferre@univ-rennes1.fr,Pedro Almodo
+ yann.ritter@univ-rennes1.fr,RITTER,Yann,Capgemini (Nantes),marc.bousse@univ-rennes1.fr,Pitt de Witt
+ valentin.rossi@univ-rennes1.fr,ROSSI,Valentin,Actedev (St Malo),didier.certain@univ-rennes1.fr,Roland Sailor
+ mathilde.guillossou@univ-rennes1.fr,GUILLOSSOU,Mathilde,SmartSoft (Bangkok),didier.certain@univ-rennes1.fr,Saranaya Kim
+ramona.bejan@univ-rennes1.fr,BEJAN,Ramona,Capgemini (Rennes),charles.queguiner@univ-rennes1.fr,Serge Kampf
+marine.binguer-moizan@univ-rennes1.fr,BINIGUER-MOIZAN,Marine,Capgemini (Rennes),gilles.lesventes@univ-rennes1.fr,Serge Kampf
+ enzo.ferreni@univ-rennes1.fr,FERRENI,Enzo,Capgemini (Rennes),mickael.foursov@univ-rennes1.fr,Serge Kampf
+ amelie.rychener@univ-rennes1.fr,RYCHENER,Amelie,Capgemini (Rennes),mickael.foursov@univ-rennes1.fr,Serge Kampf
+ alexandre.douard@univ-rennes1.fr,DOUARD,Alexandre,Capgemini (Rennes),sebastien.ferre@univ-rennes1.fr,Serge Kampf
+ fabien.marot@univ-rennes1.fr,MAROT,Fabien,Capgemini (Rennes),sebastien.ferre@univ-rennes1.fr,Serge Kampf
+ paul-alain.fokam-tamdem@univ-rennes1.fr,FOKAM TAMDEM,Paul-Alain,OBS (Rennes),francois.poulet@univ-rennes1.fr,Stephane Richard
+ jean-michel.chaladyj@univ-rennes1.fr,CHALADYJ,Jean-Michel,OBS (Rennes),sebastien.ferre@univ-rennes1.fr,Stephane Richard
+ thomas.le-naour@univ-rennes1.fr,LE NAOUR,Thomas,SII (Rennes),mathieu.acher@univ-rennes1.fr,Theo Reme
+ cyril.cocherel@univ-rennes1.fr,COCHEREL,Cyril,Atos (Rennes),noel.plouzeau@univ-rennes1.fr,Thierry Breton
+ anabella.ndabaneze@univ-rennes1.fr,NDABANEZE,Anabella,Atos (Rennes),sebastien.ferre@univ-rennes1.fr,Thierry Breton
+ carla.tunqui-neira@univ-rennes1.fr,TUNQUI NEIRA,Carla,Capgemini (Rennes),sebastien.ferre@univ-rennes1.fr,Ulysse Hill
+ andy.labbe@univ-rennes1.fr,LABBE,Andy,Steria (Nantes),marc.bousse@univ-rennes1.fr,Vincent Paris

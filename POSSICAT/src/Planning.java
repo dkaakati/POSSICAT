@@ -1,36 +1,59 @@
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 
-public class Planning {
+import com.sun.javafx.logging.Logger;
+
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+public class Planning implements Initializable {
+	
+	Button button;
 
 	int N, E, T, S;
 	boolean isFinised = false;
 	int nbInserted = 0;
-	int log = 1;
+	int log = 0;
 	
 	ListActeur enseignants = new ListActeur();
 	ListActeur tuteurs = new ListActeur();
+	List<Student> etudiants = new ArrayList<Student>();
 	Map<Integer, List<Creneau>> planning;
 	
+	private Stage stage;
+	private Desktop desktop = Desktop.getDesktop();
+	
+	final FileChooser fileChooser = new FileChooser();
+	
 
-	public Planning() {
-		readCSV();
+	public Planning(Stage primaryStage) throws IOException {
+		this.stage = primaryStage;
+		//readCSV();
 	};
 
-	public void readCSV() {
+	public void readCSV() throws IOException {
 		
 		N = 8*5;
 		
 		planning = new HashMap<Integer, List<Creneau>>();
 		for(int periode = 0; periode < N ; periode++) {
 			List<Creneau> salles = new ArrayList<Creneau>();
-			salles.add(null);
-			salles.add(null);
+			//salles.add(null);
+			//salles.add(null);
 			planning.put(periode, salles);
 		}
 		
@@ -42,17 +65,17 @@ public class Planning {
 			System.err.println(tuteurs.list.size() + " tuteurs");
 		}
 
-		int nbSoutenance = parser.readCSV(enseignants, tuteurs, N);
+		int nbSoutenance = parser.readCSV(enseignants, tuteurs, etudiants, N);
 		if(log==0) {
 			System.err.println(nbSoutenance + " soutenances");
+			System.err.println(etudiants);
 		}
-		
-		
-	
 
 		for(int i = 0; i < nbSoutenance; i++) {
 			insertData();
 		}
+		
+		parser.writeData(planning);
 		
 	}
 	
@@ -70,7 +93,6 @@ public class Planning {
 		} else {
 			t = (Tuteur)act;
 		}
-		System.err.println("Acteur le moins disponible : " + act);
 		if(log==0) {
 			System.err.println("");
 			System.err.println("On récupère les acteurs en relations les moins disponibles");
@@ -102,7 +124,8 @@ public class Planning {
 				System.err.println("Acteur " + act);
 				System.err.println("Tuteur " + t);
 			}
-			Creneau c = creneauCommun(e, t);
+			Student s = getStudent(e, t);
+			Creneau c = creneauCommun(e, t, s);
 			if(log==0) {
 				System.err.println(c);
 			}
@@ -110,8 +133,10 @@ public class Planning {
 				l.list.remove(act);
 			} else {
 				inserted = true;
+				
 				if(log==0 || log==1) {
 					System.err.println(nbInserted + "\n-----------------");
+					System.err.println("\tEtudiant " + c.getStudent());
 					System.err.println("\tEnseignant " + c.getEnseignant());
 					System.err.println("\tTuteur " + c.getTuteur());
 					System.err.println("\tCandide " + c.getCandide());
@@ -135,22 +160,38 @@ public class Planning {
 					enseignants.list.remove(c.getCandide());
 				}
 				
-				List<Creneau> salles = planning.get(c.getPeriode());
-				if(salles.get(0) == null) {
-					System.err.println("\tSalle 1");
-					salles.remove(0);
-					salles.add(c);
-				} else if(salles.get(1) == null) {
-					System.err.println("\tSalle 2");
-					salles.remove(1);
-					salles.add(c);
-				}
+				insertCreneauInPlanning(c);
 				
 				nbInserted++;
 			}
 		}
 	}
 	
+	private void insertCreneauInPlanning(Creneau c) {
+		List<Creneau> salles = planning.get(c.getPeriode());
+		
+		int size = salles.size();
+		if(size == 0) {
+			c.setSalle(1);
+			salles.add(c);
+		} else if(size == 1) {
+			c.setSalle(2);
+			salles.add(c);
+		} else {
+			new Exception("Plus de salles disponibles");
+		}
+	}
+
+	private Student getStudent(Enseignant e, Tuteur t) {
+		for(Student s : etudiants) {
+			if(s.getEnseignant() == e && s.getTuteur() == t) {
+				etudiants.remove(s);
+				return s;
+			}
+		}
+		return null;
+	}
+
 	public Acteur getActeurLeMoinsDisponible() {
 		
 		Acteur e = enseignants.getActeurLeMoinsDisponible();
@@ -163,7 +204,7 @@ public class Planning {
 		}
 	}
 	
-	public Creneau creneauCommun(Enseignant e, Tuteur t) {
+	public Creneau creneauCommun(Enseignant e, Tuteur t, Student s) {
 		if(log==0) {
 			System.err.println(e + " " + t);
 		}
@@ -210,7 +251,11 @@ public class Planning {
 			}
 			for(int periode : creneauxCommuns) {
 				if(c.getDisponibilites().get(periode)) {
-					return new Creneau(periode, e, c, t);
+					// Vérifier si une salle est disponible
+					System.err.println("SALLES DISPO " + planning.get(periode).size());
+					if(planning.get(periode).size()<2) {
+						return new Creneau(periode, e, c, t, s);
+					}
 				}
 			}
 			listeCandide.remove(c);
@@ -219,4 +264,44 @@ public class Planning {
 
 		return null;
 	}
+
+	/* (non-Javadoc)
+	 * @see javafx.fxml.Initializable#initialize(java.net.URL, java.util.ResourceBundle)
+	 */
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		
+	}
+	
+	public void openJeuDonnees() {
+		File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            openFile(file);
+            System.err.println(file.getAbsolutePath());
+        }
+	}
+	
+	public void openContraintesEns() {
+		File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            openFile(file);
+            System.err.println(file.getAbsolutePath());
+        }
+	}
+	
+	public void openContraintesTut() {
+		File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            openFile(file);
+            System.err.println(file.getAbsolutePath());
+        }
+	}
+	
+	private void openFile(File file) {
+        /*try {
+            //desktop.open(file);
+        } catch (IOException ex) {
+
+        }*/
+    }
 }

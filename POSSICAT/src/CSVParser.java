@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -7,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 
 public class CSVParser {
 
@@ -22,7 +26,7 @@ public class CSVParser {
 
         BufferedReader br = null;
         String line = "";
-        String cvsSplitBy = ";";
+        String cvsSplitBy = ",";
 
         try {
 
@@ -94,19 +98,20 @@ public class CSVParser {
 	/**
 	 * @param enseignants
 	 * @param tuteurs
+	 * @param etudiants 
 	 * @param nbSoutenancesEnseignants
 	 * @param nbSoutenancesTuteurs
 	 * @param relationsEnseignants
 	 * @param relationsTuteurs
 	 * @param N
 	 */
-	public int readCSV(ListActeur enseignants, ListActeur tuteurs, int N) {
+	public int readCSV(ListActeur enseignants, ListActeur tuteurs, List<Student> etudiants, int N) {
         
         String donnees= "data/donneesLite2.csv";
 
         BufferedReader br = null;
         String line = "";
-        String cvsSplitBy = ";";
+        String cvsSplitBy = ",";
         int nbSoutenance = 0;
         
         try {
@@ -116,6 +121,7 @@ public class CSVParser {
             while ((line = br.readLine()) != null) {
                 // use comma as separator
                 String[] row = line.split(cvsSplitBy);
+                String stu_name = row[0];
                 String ens_name = row[4];
                 String tut_name = row[5];
                 
@@ -127,6 +133,9 @@ public class CSVParser {
                 Tuteur t = (Tuteur)tuteurs.get(tut_name);
                 t.incNbSoutenances();
                 t.addRelation(enseignants.get(ens_name));
+                
+                etudiants.add(new Student(stu_name, e, t));
+                
                 nbSoutenance++;
             }
         } catch (FileNotFoundException e) {
@@ -144,6 +153,41 @@ public class CSVParser {
         }
 		
         return nbSoutenance;
+	}
+
+	/**
+	 * @param planning
+	 * @throws IOException 
+	 */
+	public void writeData(Map<Integer, List<Creneau>> planning) throws IOException {
+		/*StringBuilder sb = new StringBuilder("Période" + ";" 
+				+ "Etudiant" + ";"
+				+ "Tuteur" + ";"
+				+ "Enseignant" + ";"
+				+ "Candide" + "\n");*/
+		StringBuilder sb = new StringBuilder();
+		Set<Integer> periodes = planning.keySet();
+		for(int periode : periodes) {
+			if(periode%8==0) {
+				sb.append(",,,,,,,,,,,\nJOUR " + ((periode/8)+1) + ",SALLE 0,,,,,SALLE1,,,,,\n");
+			}
+			List<Creneau> creneaux = planning.get(periode);
+			for(Creneau c : creneaux) {
+					if(c.getSalle()==1) {
+						sb.append(c.getHoraire() + ",");
+					}
+					sb.append(c.getStudent() + ","
+							+ c.getTuteur() + ","
+							+ c.getEnseignant() + ","
+							+ c.getCandide() + ", ,");
+			}
+			if(creneaux.size()==1) {
+				sb.append(",,,,,");
+			}
+			sb.append("\n");
+		}
+		System.out.println(sb.toString());
+		Files.write(sb, new File("data/output.csv"), Charsets.UTF_8);
 	}
 
 }
