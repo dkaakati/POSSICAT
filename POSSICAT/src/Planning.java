@@ -1,13 +1,28 @@
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 
-public class Planning {
+import com.sun.javafx.logging.Logger;
+
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+public class Planning implements Initializable {
+	
+	Button button;
 
 	int N, E, T, S;
 	boolean isFinised = false;
@@ -19,9 +34,15 @@ public class Planning {
 	List<Student> etudiants = new ArrayList<Student>();
 	Map<Integer, List<Creneau>> planning;
 	
+	private Stage stage;
+	private Desktop desktop = Desktop.getDesktop();
+	
+	final FileChooser fileChooser = new FileChooser();
+	
 
-	public Planning() throws IOException {
-		readCSV();
+	public Planning(Stage primaryStage) throws IOException {
+		this.stage = primaryStage;
+		//readCSV();
 	};
 
 	public void readCSV() throws IOException {
@@ -243,4 +264,44 @@ public class Planning {
 
 		return null;
 	}
+
+	/* (non-Javadoc)
+	 * @see javafx.fxml.Initializable#initialize(java.net.URL, java.util.ResourceBundle)
+	 */
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		
+	}
+	
+	public void openJeuDonnees() {
+		File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            openFile(file);
+            System.err.println(file.getAbsolutePath());
+        }
+	}
+	
+	public void openContraintesEns() {
+		File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            openFile(file);
+            System.err.println(file.getAbsolutePath());
+        }
+	}
+	
+	public void openContraintesTut() {
+		File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            openFile(file);
+            System.err.println(file.getAbsolutePath());
+        }
+	}
+	
+	private void openFile(File file) {
+        /*try {
+            //desktop.open(file);
+        } catch (IOException ex) {
+
+        }*/
+    }
 }
