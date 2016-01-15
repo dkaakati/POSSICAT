@@ -15,14 +15,27 @@ import com.sun.javafx.logging.Logger;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
+import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.swing.*;
+
 public class Planning implements Initializable {
-	
-	Button button;
+
+	@FXML
+	MenuButton help1;
+	@FXML
+	MenuButton help2;
+	@FXML
+	MenuButton help3;
+
 
 	int N, E, T, S;
 	boolean isFinised = false;
@@ -270,7 +283,30 @@ public class Planning implements Initializable {
 	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		
+		Image imgDonnees = new Image(getClass().getResource("donnees.png").toString());
+		ImageView helpDonnees = new ImageView(imgDonnees);
+		Image imgContraintesEns = new Image(getClass().getResource("contraintesEns.png").toString());
+		ImageView helpContraintesEns = new ImageView(imgContraintesEns);
+		Image imgContraintesTut = new Image(getClass().getResource("contraintesTut.png").toString());
+		ImageView helpContraintesTut = new ImageView(imgContraintesTut);
+		final MenuItem helpPopup1 = new MenuItem();
+		final MenuItem helpPopup2 = new MenuItem();
+		final MenuItem helpPopup3 = new MenuItem();
+
+		helpPopup1.setGraphic(helpDonnees);
+		helpPopup2.setGraphic(helpContraintesEns);
+		helpPopup3.setGraphic(helpContraintesTut);
+
+		help1.getItems().setAll(
+				helpPopup1
+		);
+		help2.getItems().setAll(
+				helpPopup2
+		);
+		help3.getItems().setAll(
+				helpPopup3
+		);
+
 	}
 	
 	public void openJeuDonnees() {
@@ -304,4 +340,5 @@ public class Planning implements Initializable {
 
         }*/
     }
+
 }
