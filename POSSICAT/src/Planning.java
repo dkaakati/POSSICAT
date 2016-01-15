@@ -13,10 +13,21 @@ import java.util.Set;
 
 import com.sun.javafx.logging.Logger;
 
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -305,15 +316,9 @@ public class Planning implements Initializable {
 		helpPopup2.setGraphic(helpContraintesEns);
 		helpPopup3.setGraphic(helpContraintesTut);
 
-		help1.getItems().setAll(
-				helpPopup1
-		);
-		help2.getItems().setAll(
-				helpPopup2
-		);
-		help3.getItems().setAll(
-				helpPopup3
-		);
+		help1.getItems().setAll(helpPopup1);
+		help2.getItems().setAll(helpPopup2);
+		help3.getItems().setAll(helpPopup3);
 
 	}
 	

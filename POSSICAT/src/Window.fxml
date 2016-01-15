@@ -13,7 +13,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<VBox prefHeight="450.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="450.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" minHeight="226.0" prefHeight="226.0" prefWidth="394.0" VBox.vgrow="ALWAYS">
          <children>
@@ -25,7 +25,7 @@
                   <Image url="@../res/one.png" />
                </image>
             </ImageView>
-            <Button fx:id="generateBtn" layoutX="571.0" layoutY="155.0" mnemonicParsing="false" prefHeight="99.0" prefWidth="179.0" onAction="#readCSV" text="Générer Planning" textAlignment="CENTER" wrapText="true">
+            <Button fx:id="generateBtn" layoutX="571.0" layoutY="155.0" mnemonicParsing="false" onAction="#readCSV" prefHeight="99.0" prefWidth="179.0" text="Générer Planning" textAlignment="CENTER" wrapText="true">
                <font>
                   <Font size="22.0" />
                </font></Button>
@@ -35,22 +35,39 @@
                </image>
             </ImageView>
             <Separator layoutX="57.0" layoutY="262.0" prefHeight="16.0" prefWidth="312.0" />
-            <Text layoutX="112.0" layoutY="183.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Importer votre jeu de données" />
-            <Button fx:id="openBtn2" layoutX="106.0" layoutY="200.0" mnemonicParsing="false" onAction="#openContraintesEns" text="Import CSV" />
-            <Button layoutX="317.0" layoutY="312.0" mnemonicParsing="false" text="?" textOverrun="LEADING_ELLIPSIS" />
-            <ImageView fitHeight="42.0" fitWidth="55.0" layoutX="46.0" layoutY="326.0" pickOnBounds="true" preserveRatio="true">
+            <Text layoutX="112.0" layoutY="200.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Importer contraintes enseignants" />
+            <Button fx:id="openBtn2" layoutX="106.0" layoutY="217.0" mnemonicParsing="false" onAction="#openContraintesEns" text="Import CSV" />
+            <ImageView fitHeight="42.0" fitWidth="55.0" layoutX="37.0" layoutY="328.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../res/three.png" />
                </image>
             </ImageView>
             <Separator layoutX="62.0" layoutY="391.0" prefHeight="16.0" prefWidth="312.0" />
-            <Text layoutX="121.0" layoutY="330.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Importer votre jeu de données" />
-            <Button fx:id="openBtn3" layoutX="115.0" layoutY="347.0" mnemonicParsing="false" onAction="#openContraintesTut" text="Import CSV" />
-             <AnchorPane layoutX="425.0" layoutY="20.0" prefHeight="200.0" prefWidth="246.0">
-                 <children>
-                     <ListView fx:id="listSalles" prefHeight="101.0" prefWidth="252.0" />
-                 </children>
-             </AnchorPane>
+            <Text layoutX="112.0" layoutY="332.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Importer contraintes tuteurs" />
+            <Button fx:id="openBtn3" layoutX="106.0" layoutY="349.0" mnemonicParsing="false" onAction="#openContraintesTut" text="Import CSV" />
+            <MenuButton fx:id="help1" layoutX="289.0" layoutY="42.0" mnemonicParsing="false" text="?">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+                <MenuItem mnemonicParsing="false" text="Action 2" />
+              </items>
+            </MenuButton>
+            <MenuButton fx:id="help2" layoutX="289.0" layoutY="183.0" mnemonicParsing="false" text="?">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Action 1" />
+                  <MenuItem mnemonicParsing="false" text="Action 2" />
+               </items>
+            </MenuButton>
+            <MenuButton fx:id="help3" layoutX="289.0" layoutY="315.0" mnemonicParsing="false" text="?">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Action 1" />
+                  <MenuItem mnemonicParsing="false" text="Action 2" />
+               </items>
+            </MenuButton>
+                   <AnchorPane layoutX="435.0" layoutY="14.0" prefHeight="124.0" prefWidth="252.0">
+                       <children>
+                           <ListView fx:id="listSalles" prefHeight="101.0" prefWidth="252.0" />
+                       </children>
+                   </AnchorPane>
          </children>
     </AnchorPane>
   </children>
