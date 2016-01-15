@@ -181,7 +181,7 @@ public class CSVParser {
 			sb.append("\n");
 		}
 		System.out.println(sb.toString());
-		Files.write(sb, new File("data/output.csv"), Charsets.UTF_8);
+		Files.write(sb, new File(System.getProperty("user.home")+"/Downloads/generatedCSV.csv"), Charsets.UTF_8);
 	}
 
 }

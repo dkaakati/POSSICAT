@@ -86,7 +86,8 @@ public class Planning implements Initializable {
 		}
 		
 		parser.writeData(planning, sallesSelectionnees);
-		desktop.open(new File(System.getProperty("user.dir") + "/data/output.csv"));
+		
+		desktop.open(new File(System.getProperty("user.home")+"/Downloads/generatedCSV.csv"));
 		
 		
 	}
