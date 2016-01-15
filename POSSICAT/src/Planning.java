@@ -1,185 +1,222 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * 
- */
-
-/**
- * @author François Esnault
- * @date 7 janv. 2016
- */
 public class Planning {
 
 	int N, E, T, S;
+	boolean isFinised = false;
+	int nbInserted = 0;
+	int log = 1;
 	
-	Map<String, Map<Integer, Boolean>> enseignants;
-	Map<String, Integer> nbSoutenancesEnseignants;
-	Map<String, List<Acteur>> relationsEnseignants;
+	ListActeur enseignants = new ListActeur();
+	ListActeur tuteurs = new ListActeur();
+	Map<Integer, List<Creneau>> planning;
 	
-	Map<String, Map<Integer, Boolean>> tuteurs;
-	Map<String, Integer> nbSoutenancesTuteurs;
-	Map<String, List<Acteur>> relationsTuteurs;
-	
-	Map<Integer, List<Boolean>> planning;
-	enum Role {Enseignant, Tuteur};
 
 	public Planning() {
 		readCSV();
 	};
 
 	public void readCSV() {
-		// Ouvrir le fichier CSV
-		CSVParser parser = new CSVParser();
-		parser.readEnseignants(8); /* Le paramètre est le nombre de périodes par jour
-/*
-
-		// On récupère N le nombre de période
-		N = 10;
-
-		// On récupère E le nombre d'enseignants
-		E = 5;
-		for(int i = 0; i < E; i++) {
-			// On récupère le nom de l'enseignant
-			String nom = "Test";
-			// On créé une map pour chaque enseignant
-			Map<Integer, Boolean> m = new HashMap<Integer, Boolean>();
-			// On met à true ou false selon les disponibilités
-			enseignants.put(nom, m);
-		}
-
-		// On récupère T le nombre de tuteurs
-		T = 5;
-		for(int i = 0; i < T; i++) {
-			// On récupère le nom du tuteur
-			String nom = "Test";
-			// On créé une map pour chaque tuteur
-			Map<Integer, Boolean> m = new HashMap<Integer, Boolean>();
-			// On met à true ou false selon les disponibilités
-			tuteurs.put(nom, m);
-		}
-
-		// On récupère le nombre de salle disponibles
-		S = 2;
-
-		// On créé le planning
-		planning = new HashMap<Integer, List<Boolean>>();
-		// Pour chaque période, on insère la liste des salles
-		for(int i = 0; i < N; i++) {
-			List<Boolean> l = new ArrayList<Boolean>();
-			for(int s = 0; s < S; s++) {
-				l.add(false);
-			}
-			planning.put(i, l);
+		
+		N = 8*5;
+		
+		planning = new HashMap<Integer, List<Creneau>>();
+		for(int periode = 0; periode < N ; periode++) {
+			List<Creneau> salles = new ArrayList<Creneau>();
+			salles.add(null);
+			salles.add(null);
+			planning.put(periode, salles);
 		}
 		
-		while(true) {
+		CSVParser parser = new CSVParser();
+		parser.readDispo(Role.Enseignant, enseignants, 8);
+		parser.readDispo(Role.Tuteur, tuteurs, 8);
+		if(log==0) {
+			System.err.println(enseignants.list.size() + " enseignants");
+			System.err.println(tuteurs.list.size() + " tuteurs");
+		}
+
+		int nbSoutenance = parser.readCSV(enseignants, tuteurs, N);
+		if(log==0) {
+			System.err.println(nbSoutenance + " soutenances");
+		}
+		
+		
+	
+
+		for(int i = 0; i < nbSoutenance; i++) {
 			insertData();
-		}*/
+		}
+		
 	}
 	
 	public void insertData() {
 		boolean inserted = false;
-		Acteur a = getActeurMoinsDisponible();
-		System.err.println("ACTEUR LE MOINS DISPO ["+a.getRole()+ " " + a.getName() + "]");
-		List<Acteur> l = getActeursEnRelation(a);
+		
+		if(log==0) {
+			System.err.println("On récupère l'acteur le moins disponible (enseignant ou tuteur)");
+		}
+		Acteur act = getActeurLeMoinsDisponible();
+		Enseignant e = null;
+		Tuteur t = null;
+		if(act instanceof Enseignant) {
+			e = (Enseignant)act;
+		} else {
+			t = (Tuteur)act;
+		}
+		System.err.println("Acteur le moins disponible : " + act);
+		if(log==0) {
+			System.err.println("");
+			System.err.println("On récupère les acteurs en relations les moins disponibles");
+		}
+		
+		ListActeur l = new ListActeur(act.getRelations());
+		if(log==0) {
+			System.err.println("Liste des acteurs en relation avec " + act + " => " + l);
+		}
+		
 		while(!inserted) {
-			//Acteur b 
-		}
-	}
-	
-	public List<Acteur> getActeursEnRelation(Acteur a) {
-		if(a.getRole() == Role.Enseignant) {
-			return relationsEnseignants.get(a.getName());
-		} else {
-			return relationsTuteurs.get(a.getName());
-		}
-	}
-	
-	public Acteur getActeurMoinsDisponible() {
-		Acteur acteur = new Acteur();
-		acteur.setDispo(999);
-		
-		Set<String> keys = enseignants.keySet();
-		for(String name : keys) {
-			int dispo = getDispo(Role.Enseignant, name);
-			if(dispo<acteur.getDispo()) {
-				acteur.setDispo(dispo);
-				acteur.setName(name);
-				acteur.setRole(Role.Enseignant);
+			if(l.list.isEmpty()) {
+				if(log==0) {
+					System.err.println("On génère une exception");
+				}
+				new Exception("On génère une exception");
 			}
-		}
-		
-		keys = tuteurs.keySet();
-		for(String name : keys) {
-			int dispo = getDispo(Role.Tuteur, name);
-			if(dispo<acteur.getDispo()) {
-				acteur.setDispo(dispo);
-				acteur.setName(name);
-				acteur.setRole(Role.Tuteur);
-			}
-		}
-		
-		return acteur;
-	}
-	
-	public int getDispo(Role a, String name) {
-		if(a == a.Enseignant) {
-			int nbSoutenance = nbSoutenancesEnseignants.get(name);
 			
-			Map<Integer, Boolean> m = enseignants.get(name);
-			int nbPeriodeLibre = 0;
-			Set<Integer> keys = m.keySet();
-			for(int i : keys) {
-				if(m.get(i)) {
-					nbPeriodeLibre++;
+			act = l.getActeurLeMoinsDisponible();
+			if(log==0) {
+				System.err.println("On teste avec " + act);
+			}
+			if(act instanceof Enseignant) {
+				e = (Enseignant)act;
+			} else {
+				t = (Tuteur)act;
+			}
+			if(log==0) {
+				System.err.println("Acteur " + act);
+				System.err.println("Tuteur " + t);
+			}
+			Creneau c = creneauCommun(e, t);
+			if(log==0) {
+				System.err.println(c);
+			}
+			if(c==null) {
+				l.list.remove(act);
+			} else {
+				inserted = true;
+				if(log==0 || log==1) {
+					System.err.println(nbInserted + "\n-----------------");
+					System.err.println("\tEnseignant " + c.getEnseignant());
+					System.err.println("\tTuteur " + c.getTuteur());
+					System.err.println("\tCandide " + c.getCandide());
+					System.err.println("\tA la période " + c.getPeriode());
+				}
+				
+				e.addDisponibilite(c.getPeriode());
+				t.addDisponibilite(c.getPeriode());
+				c.getCandide().addDisponibiliteCandide(c.getPeriode());
+				
+				e.removeRelation(t);
+				t.removeRelation(e);
+				
+				if(e.aFaitToutesLesSoutenances()) {
+					enseignants.list.remove(e);
+				}
+				if(t.aFaitToutesLesSoutenances()) {
+					tuteurs.list.remove(t);
+				}
+				if(c.getCandide().aFaitToutesLesSoutenances()) {
+					enseignants.list.remove(c.getCandide());
+				}
+				
+				List<Creneau> salles = planning.get(c.getPeriode());
+				if(salles.get(0) == null) {
+					System.err.println("\tSalle 1");
+					salles.remove(0);
+					salles.add(c);
+				} else if(salles.get(1) == null) {
+					System.err.println("\tSalle 2");
+					salles.remove(1);
+					salles.add(c);
+				}
+				
+				nbInserted++;
+			}
+		}
+	}
+	
+	public Acteur getActeurLeMoinsDisponible() {
+		
+		Acteur e = enseignants.getActeurLeMoinsDisponible();
+		Acteur t = tuteurs.getActeurLeMoinsDisponible();
+		
+		if(e.getDisponibilitesSoutenances()<t.getDisponibilitesSoutenances()) {
+			return e;
+		} else {
+			return t;
+		}
+	}
+	
+	public Creneau creneauCommun(Enseignant e, Tuteur t) {
+		if(log==0) {
+			System.err.println(e + " " + t);
+		}
+		Map<Integer, Boolean> dispoEnseignant = e.getDisponibilites();
+		Map<Integer, Boolean> dispoTuteur = t.getDisponibilites();
+		
+		List<Integer> creneauxCommuns = new ArrayList<Integer>();
+		
+		if(dispoEnseignant == null || dispoTuteur == null) {
+			return null;
+		}
+		
+		Set<Integer> periodes = dispoEnseignant.keySet();
+		for(int p : periodes) {
+			if(dispoEnseignant.get(p) && dispoTuteur.get(p)) {
+				creneauxCommuns.add(p);
+			}
+		}
+		
+		if(log==0) {
+			System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxCommuns);
+		}
+		
+		if(creneauxCommuns.isEmpty()) {
+			return null;
+		}
+		
+		Set<Acteur> listeCandide = new HashSet<Acteur>(enseignants.list);
+		listeCandide.remove(e);
+		Enseignant c = null;
+		
+		if(log==0) {
+			System.err.println(listeCandide);
+		}
+		
+		while(!listeCandide.isEmpty()) {
+			
+			for(Acteur act: listeCandide) {
+				Enseignant a = (Enseignant)act;
+				// On récupère le candide a qui il reste le plus de soutenances a voir
+				if(c == null || a.getNbSoutenancesCandide()>c.getNbSoutenancesCandide()) {
+					c = a;
 				}
 			}
-			return nbPeriodeLibre-nbSoutenance*2;
-		} else {
-			int nbSoutenance = nbSoutenancesTuteurs.get(name);
-			
-			Map<Integer, Boolean> m = tuteurs.get(name);
-			int nbPeriodeLibre = 0;
-			Set<Integer> keys = m.keySet();
-			for(int i : keys) {
-				if(m.get(i)) {
-					nbPeriodeLibre++;
+			for(int periode : creneauxCommuns) {
+				if(c.getDisponibilites().get(periode)) {
+					return new Creneau(periode, e, c, t);
 				}
 			}
-			return nbPeriodeLibre-nbSoutenance;
+			listeCandide.remove(c);
+			c = null;
 		}
-	}
 
-	class Acteur {
-		Role role;
-		String name;
-		int dispo;
-		public Acteur() {};
-		public Acteur(Role role, String name) {
-			this.role = role;
-			this.name = name;
-		}
-		public Role getRole() {
-			return role;
-		}
-		public void setRole(Role role) {
-			this.role = role;
-		}
-		public String getName() {
-			return name;
-		}
-		public void setName(String name) {
-			this.name = name;
-		}
-		public int getDispo() {
-			return dispo;
-		}
-		public void setDispo(int dispo) {
-			this.dispo = dispo;
-		}
+		return null;
 	}
 }
