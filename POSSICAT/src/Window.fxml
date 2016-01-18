@@ -25,7 +25,7 @@
                   <Image url="@../res/one.png" />
                </image>
             </ImageView>
-            <Button fx:id="generateBtn" layoutX="571.0" layoutY="155.0" mnemonicParsing="false" onAction="#readCSV" prefHeight="99.0" prefWidth="179.0" text="Générer Planning" textAlignment="CENTER" wrapText="true">
+            <Button fx:id="generateBtn" layoutX="472.0" layoutY="313.0" mnemonicParsing="false" onAction="#readCSV" prefHeight="99.0" prefWidth="179.0" text="Générer Planning" textAlignment="CENTER" wrapText="true">
                <font>
                   <Font size="22.0" />
                </font></Button>
@@ -68,6 +68,14 @@
                            <ListView fx:id="listSalles" prefHeight="101.0" prefWidth="252.0" />
                        </children>
                    </AnchorPane>
+            <AnchorPane layoutX="435.0" layoutY="146.0" prefHeight="114.0" prefWidth="312.0">
+               <children>
+                  <DatePicker fx:id="dateDebut" layoutX="145.0" layoutY="14.0" onAction="#validDate" prefHeight="27.0" prefWidth="153.0" promptText="jj/mm/aaaa" />
+                  <DatePicker fx:id="dateFin" layoutX="145.0" layoutY="58.0" prefHeight="27.0" prefWidth="153.0" promptText="jj/mm/aaaa" />
+                  <Text layoutX="45.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Date début" />
+                  <Text layoutX="55.0" layoutY="76.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Date fin" />
+               </children>
+            </AnchorPane>
          </children>
     </AnchorPane>
   </children>

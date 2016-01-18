@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -151,15 +152,18 @@ public class CSVParser {
 	/**
 	 * @param planning
 	 * @param sallesSelectionnees 
+	 * @param date 
+	 * @param nbPeriodesParJour 
 	 * @throws IOException 
 	 */
-	public void writeData(Map<Integer, List<Creneau>> planning, ObservableList<String> sallesSelectionnees) throws IOException {
+	public void writeData(Map<Integer, List<Creneau>> planning, ObservableList<String> sallesSelectionnees, Calendar date, int nbPeriodesParJour) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		Set<Integer> periodes = planning.keySet();
 		sb.append("sep=,\n");
 		for(int periode : periodes) {
-			if(periode%8==0) {
-				sb.append(",,,,,,,,,,,\nJOUR " + ((periode/8)+1) + ",");
+			if(periode%nbPeriodesParJour==0) {
+				sb.append(",,,,,,,,,,,\n" + getDate(date) + ",");
+				date.add(Calendar.DATE, 1);
 				for(String salle : sallesSelectionnees) {
 					sb.append(salle + ",,,,,");
 				}
@@ -182,6 +186,10 @@ public class CSVParser {
 		}
 		System.out.println(sb.toString());
 		Files.write(sb, new File(System.getProperty("user.home")+"/Downloads/generatedCSV.csv"), Charsets.UTF_8);
+	}
+	
+	public String getDate(Calendar c) {
+		return c.get(Calendar.DAY_OF_MONTH) + "/" + c.get(Calendar.MONTH) + "/" + c.get(Calendar.YEAR);
 	}
 
 }

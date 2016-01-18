@@ -2,26 +2,24 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
-import com.sun.javafx.logging.Logger;
-
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -30,8 +28,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
-import javax.swing.*;
 
 public class Planning implements Initializable {
 
@@ -42,14 +38,20 @@ public class Planning implements Initializable {
 	@FXML
 	MenuButton help3;
 
+	@FXML
+	DatePicker 	dateDebut = new DatePicker(), 
+				dateFin = new DatePicker();
 
-	int N, E, T, S;
+	int nbJours, // Nombre de jours ouvrés
+		nbPeriodesParJour,
+		nbPeriodesEnTout,
+		nbSalles; // Nombre de salles disponibles
 	boolean isFinised = false;
 	int nbInserted = 0;
 	int log = 2;
 
 	@FXML
-	private ListView listSalles;
+	private ListView<String> listSalles;
 
 	protected ListProperty<String> listProperty = new SimpleListProperty<>();
 	protected List<String> salles = new ArrayList<>();
@@ -74,36 +76,46 @@ public class Planning implements Initializable {
 	};
 
 	public void readCSV() throws IOException {
+		
+		Date debut = Date.from(dateDebut.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+		Date fin = Date.from(dateFin.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+		
+		nbJours = getWorkingDaysBetweenTwoDates(debut, fin)+1;
+		nbPeriodesParJour = 8;
+		
 		ObservableList<String> sallesSelectionnees = listSalles.getSelectionModel().getSelectedItems();
-		S = sallesSelectionnees.size();
+		nbSalles = sallesSelectionnees.size();
 
-		N = 8*5;
+		nbPeriodesEnTout = nbPeriodesParJour*nbJours;
 		
 		planning = new HashMap<Integer, List<Creneau>>();
-		for(int periode = 0; periode < N ; periode++) {
+		for(int periode = 0; periode < nbPeriodesEnTout ; periode++) {
 			List<Creneau> salles = new ArrayList<Creneau>();
 			planning.put(periode, salles);
 		}
 		
 		CSVParser parser = new CSVParser();
-		parser.readDispo(pathContraintesEns, Role.Enseignant, enseignants, 8);
-		parser.readDispo(pathContraintesTut, Role.Tuteur, tuteurs, 8);
+		parser.readDispo(pathContraintesEns, Role.Enseignant, enseignants, nbPeriodesParJour);
+		parser.readDispo(pathContraintesTut, Role.Tuteur, tuteurs, nbPeriodesParJour);
 		if(log==0) {
 			System.err.println(enseignants.list.size() + " enseignants");
 			System.err.println(tuteurs.list.size() + " tuteurs");
 		}
 
-		int nbSoutenance = parser.readCSV(pathDonnees, enseignants, tuteurs, etudiants, N);
+		int nbSoutenances = parser.readCSV(pathDonnees, enseignants, tuteurs, etudiants, nbPeriodesEnTout);
 		if(log==0) {
-			System.err.println(nbSoutenance + " soutenances");
+			System.err.println(nbSoutenances + " soutenances");
 			System.err.println(etudiants);
 		}
 
-		for(int i = 0; i < nbSoutenance; i++) {
+		for(int i = 0; i < nbSoutenances; i++) {
 			insertData();
 		}
 		
-		parser.writeData(planning, sallesSelectionnees);
+		Calendar c = Calendar.getInstance();
+		c.set(dateDebut.getValue().getYear(), dateDebut.getValue().getMonthValue(), dateDebut.getValue().getDayOfMonth());
+		
+		parser.writeData(planning, sallesSelectionnees, c, nbPeriodesParJour);
 
 		desktop.open(new File(System.getProperty("user.home")+"/Downloads/generatedCSV.csv"));
 
@@ -277,7 +289,7 @@ public class Planning implements Initializable {
 				if(c.getDisponibilites().get(periode)) {
 					// Vérifier si une salle est disponible
 					System.err.println("SALLES DISPO " + planning.get(periode).size());
-					if(planning.get(periode).size()<S) {
+					if(planning.get(periode).size()<nbSalles) {
 						return new Creneau(periode, e, c, t, s);
 					}
 				}
@@ -294,14 +306,25 @@ public class Planning implements Initializable {
 	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		/**
+		 * Gestion des salles
+		 */
 		salles.add("i50");
 		salles.add("i51");
 		salles.add("Jersey");
-		salles.add("Genersey");
+		salles.add("Guernesey");
 		listSalles.itemsProperty().bind(listProperty);
 		listSalles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		listProperty.set(FXCollections.observableArrayList(salles));
+		
+		/**
+		 * Gestion des dates
+		 */
+		dateDebut.setValue(LocalDate.now());
 
+		/**
+		 * Gestion des tooltips
+		 */
 		Image imgDonnees = new Image(getClass().getResource("donnees.png").toString());
 		ImageView helpDonnees = new ImageView(imgDonnees);
 		Image imgContraintesEns = new Image(getClass().getResource("contraintesEns.png").toString());
@@ -311,15 +334,20 @@ public class Planning implements Initializable {
 		final MenuItem helpPopup1 = new MenuItem();
 		final MenuItem helpPopup2 = new MenuItem();
 		final MenuItem helpPopup3 = new MenuItem();
-
 		helpPopup1.setGraphic(helpDonnees);
 		helpPopup2.setGraphic(helpContraintesEns);
 		helpPopup3.setGraphic(helpContraintesTut);
-
 		help1.getItems().setAll(helpPopup1);
 		help2.getItems().setAll(helpPopup2);
 		help3.getItems().setAll(helpPopup3);
 
+	}
+	
+	public void validDate() {
+		Calendar c = Calendar.getInstance();
+		c.set(dateDebut.getValue().getYear(), dateDebut.getValue().getMonthValue(), dateDebut.getValue().getDayOfMonth());
+		c.add(Calendar.DATE, 4);
+		dateFin.setValue(LocalDate.of(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)));
 	}
 	
 	public void openJeuDonnees() {
@@ -346,6 +374,36 @@ public class Planning implements Initializable {
             System.err.println(file.getAbsolutePath());
             pathContraintesTut = file.getAbsolutePath();
         }
+	}
+	
+	public int getWorkingDaysBetweenTwoDates(Date startDate, Date endDate) {
+	    Calendar startCal;
+	    Calendar endCal;
+	    startCal = Calendar.getInstance();
+	    startCal.setTime(startDate);
+	    endCal = Calendar.getInstance();
+	    endCal.setTime(endDate);
+	    int workDays = 0;
+	 
+	    //Return 0 if start and end are the same
+	    if (startCal.getTimeInMillis() == endCal.getTimeInMillis()) {
+	        return 0;
+	    }
+	 
+	    if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
+	        startCal.setTime(endDate);
+	        endCal.setTime(startDate);
+	    }
+	 
+	    do {
+	        startCal.add(Calendar.DAY_OF_MONTH, 1);
+	        if (startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY 
+	       && startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+	            ++workDays;
+	        }
+	    } while (startCal.getTimeInMillis() < endCal.getTimeInMillis());
+	 
+	    return workDays;
 	}
 
 }
