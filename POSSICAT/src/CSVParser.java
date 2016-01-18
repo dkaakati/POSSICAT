@@ -147,6 +147,81 @@ public class CSVParser {
 		
         return nbSoutenance;
 	}
+	
+	public int checkData(String data) {
+		  BufferedReader br = null;
+	        String line = "";
+	        String cvsSplitBy = ",";
+	        boolean compliant = true;
+	        int nbSoutenances = 0;
+	        
+	        try {
+
+	            br = new BufferedReader(new FileReader(data));
+	            br.readLine();
+	            while (compliant && (line = br.readLine()) != null) {
+	                // use comma as separator
+	                String[] row = line.split(cvsSplitBy);
+	            	if(row.length != 6) {
+	            		//-1 means not right number of columns
+	            		return -1;
+	            	}
+
+	            }
+	        } catch (FileNotFoundException e) {
+	            e.printStackTrace();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        } finally {
+	            if (br != null) {
+	                try {
+	                    br.close();
+	                } catch (IOException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }
+			
+	        return nbSoutenances;
+	}
+	
+	public int checkContraintes(String data) {
+		  BufferedReader br = null;
+	        String line = "";
+	        String cvsSplitBy = ",";
+	        
+	        try {
+
+	            br = new BufferedReader(new FileReader(data));
+	            br.readLine();
+	            int l = 0;//current line
+	            while ((line = br.readLine()) != null) {
+	                // use comma as separator
+	                String[] row = line.split(cvsSplitBy);
+	                if(l > 0) {
+		                for(int i = 1; i < row.length -1; i++) {
+		                	if(row[i] != " " && row[i] != "J" && row[i] != "AM" && row[i] != "M" && row[i] != "X") {
+		                		return l;
+		                	}
+		                }
+	                }
+	                l++;
+	            }
+	        } catch (FileNotFoundException e) {
+	            e.printStackTrace();
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        } finally {
+	            if (br != null) {
+	                try {
+	                    br.close();
+	                } catch (IOException e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }
+	        return -1;
+	}
 
 	/**
 	 * @param planning

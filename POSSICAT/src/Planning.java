@@ -328,7 +328,17 @@ public class Planning implements Initializable {
 		File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             System.err.println(file.getAbsolutePath());
-            pathDonnees = file.getAbsolutePath();
+            CSVParser parser = new CSVParser();
+            int checkData = parser.checkData(file.getAbsolutePath());
+            if(checkData >= 0) {
+            	System.err.println(checkData);
+                pathDonnees = file.getAbsolutePath();
+            }
+            else {
+            	System.err.println(checkData);
+            	// If < 0, shows a mistake
+            }
+
         }
 	}
 	
@@ -336,7 +346,17 @@ public class Planning implements Initializable {
 		File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             System.err.println(file.getAbsolutePath());
-            pathContraintesEns = file.getAbsolutePath();
+            CSVParser parser = new CSVParser();
+            int checkData = parser.checkContraintes(file.getAbsolutePath());
+            if(checkData < 0) {
+            	System.err.println(checkData);
+                pathContraintesEns = file.getAbsolutePath();
+            }
+            else {
+            	System.err.println(checkData+1);
+            	// If > 0, it means error on this line, we add one because count starts from zero in dev
+            }
+
         }
 	}
 	
@@ -344,7 +364,16 @@ public class Planning implements Initializable {
 		File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             System.err.println(file.getAbsolutePath());
-            pathContraintesTut = file.getAbsolutePath();
+            CSVParser parser = new CSVParser();
+            int checkData = parser.checkContraintes(file.getAbsolutePath());
+            if(checkData < 0) {
+            	System.err.println(checkData);
+                pathContraintesTut = file.getAbsolutePath();
+            }
+            else {
+            	System.err.println(checkData+1);
+            	// If > 0, it means error on this line, we add one because count starts from zero in dev
+            }
         }
 	}
 
