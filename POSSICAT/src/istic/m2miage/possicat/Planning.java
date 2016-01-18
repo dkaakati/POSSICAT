@@ -78,6 +78,10 @@ public class Planning implements Initializable {
 
 	public void readCSV() throws IOException {
 		
+		if(pathDonnees.isEmpty() || pathContraintesEns.isEmpty() || pathContraintesTut.isEmpty()) {
+			return;
+		}
+		
 		Date debut = Date.from(dateDebut.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
 		Date fin = Date.from(dateFin.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
 		
@@ -359,12 +363,12 @@ public class Planning implements Initializable {
             System.err.println(file.getAbsolutePath());
             CSVParser parser = new CSVParser();
             int checkData = parser.checkData(file.getAbsolutePath());
-            if(checkData >= 0) {
-            	System.err.println(checkData);
+            if(checkData > 0) {
+            	System.err.println("OK " + checkData + " insertions");
                 pathDonnees = file.getAbsolutePath();
             }
             else {
-            	System.err.println(checkData);
+            	System.err.println("NOK " + checkData);
             	// If < 0, shows a mistake
             }
 
@@ -378,11 +382,11 @@ public class Planning implements Initializable {
             CSVParser parser = new CSVParser();
             int checkData = parser.checkContraintes(file.getAbsolutePath());
             if(checkData < 0) {
-            	System.err.println(checkData);
+            	System.err.println("OK pour les contraintes enseignants");
                 pathContraintesEns = file.getAbsolutePath();
             }
             else {
-            	System.err.println(checkData+1);
+            	System.err.println("NOK ligne " + checkData+1);
             	// If > 0, it means error on this line, we add one because count starts from zero in dev
             }
 
@@ -396,7 +400,7 @@ public class Planning implements Initializable {
             CSVParser parser = new CSVParser();
             int checkData = parser.checkContraintes(file.getAbsolutePath());
             if(checkData < 0) {
-            	System.err.println(checkData);
+            	System.err.println("OK pour les contraintes tuteurs");
                 pathContraintesTut = file.getAbsolutePath();
             }
             else {

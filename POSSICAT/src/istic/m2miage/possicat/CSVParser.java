@@ -157,6 +157,8 @@ public class CSVParser {
 	        boolean compliant = true;
 	        int nbSoutenances = 0;
 	        
+	        System.err.println(data);
+	        
 	        try {
 
 	            br = new BufferedReader(new FileReader(data));
@@ -164,9 +166,12 @@ public class CSVParser {
 	            while (compliant && (line = br.readLine()) != null) {
 	                // use comma as separator
 	                String[] row = line.split(cvsSplitBy);
+	                System.err.println(row.length);
 	            	if(row.length != 6) {
 	            		//-1 means not right number of columns
 	            		return -1;
+	            	} else {
+	            		nbSoutenances++;
 	            	}
 
 	            }
@@ -202,7 +207,8 @@ public class CSVParser {
 	                String[] row = line.split(cvsSplitBy);
 	                if(l > 0) {
 		                for(int i = 1; i < row.length -1; i++) {
-		                	if(row[i] != " " && row[i] != "J" && row[i] != "AM" && row[i] != "M" && row[i] != "X") {
+		                	if(!row[i].equals("") && !row[i].equals("J") && !row[i].equals("AM") && !row[i].equals("M") && !row[i].equals("X")) {
+		                		System.err.println("Problème à la ligne : '" + line + "'");
 		                		return l;
 		                	}
 		                }
