@@ -1,3 +1,4 @@
+package istic.m2miage.possicat;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,7 +14,7 @@ public class Main extends Application {
     	
     	FXMLLoader loader = new FXMLLoader();
     	
-    	loader.setLocation(getClass().getResource("Window.fxml"));
+    	loader.setLocation(getClass().getResource("./Window.fxml"));
     	
     	loader.setController(p);
     	Parent root = loader.<Parent>load();

@@ -1,3 +1,4 @@
+package istic.m2miage.possicat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

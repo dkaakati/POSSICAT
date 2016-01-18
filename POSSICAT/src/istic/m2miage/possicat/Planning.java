@@ -1,3 +1,4 @@
+package istic.m2miage.possicat;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -325,11 +326,11 @@ public class Planning implements Initializable {
 		/**
 		 * Gestion des tooltips
 		 */
-		Image imgDonnees = new Image(getClass().getResource("donnees.png").toString());
+		Image imgDonnees = new Image(getClass().getResource("/donnees.png").toString());
 		ImageView helpDonnees = new ImageView(imgDonnees);
-		Image imgContraintesEns = new Image(getClass().getResource("contraintesEns.png").toString());
+		Image imgContraintesEns = new Image(getClass().getResource("/contraintesEns.png").toString());
 		ImageView helpContraintesEns = new ImageView(imgContraintesEns);
-		Image imgContraintesTut = new Image(getClass().getResource("contraintesTut.png").toString());
+		Image imgContraintesTut = new Image(getClass().getResource("/contraintesTut.png").toString());
 		ImageView helpContraintesTut = new ImageView(imgContraintesTut);
 		final MenuItem helpPopup1 = new MenuItem();
 		final MenuItem helpPopup2 = new MenuItem();

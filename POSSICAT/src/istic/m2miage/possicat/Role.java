@@ -1,3 +1,4 @@
+package istic.m2miage.possicat;
 /**
  * 
  */
