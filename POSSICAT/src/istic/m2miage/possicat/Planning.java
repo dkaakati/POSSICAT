@@ -78,7 +78,7 @@ public class Planning implements Initializable {
 		nbSalles; // Nombre de salles disponibles
 	boolean isFinised = false;
 	int nbInserted = 0;
-	int log = 2;
+	int log = 1;
 
 	@FXML
 	private ListView<String> listSalles;
@@ -286,7 +286,9 @@ public class Planning implements Initializable {
 		Map<Acteur, Integer> dispoCandide = new HashMap<Acteur, Integer>();
 		for(Acteur candide : listeCandide) {
 			Enseignant ens = (Enseignant)candide;
-			dispoCandide.put(ens, ens.getNbSoutenancesCandide());
+			if(ens.getNbSoutenancesCandide()>0) {
+				dispoCandide.put(ens, ens.getNbSoutenancesCandide());
+			}
 		}
 		
 		Enseignant c = null;
@@ -319,6 +321,8 @@ public class Planning implements Initializable {
 				creneauxPonderations.put(periode, value+4);
 			}
 			
+			value = creneauxPonderations.get(periode);
+			
 			if((periode%8)!=0) {
 				List<Creneau> avant = planning.get(periode-1);
 				for(Creneau creneau : avant) {
@@ -336,16 +340,22 @@ public class Planning implements Initializable {
 			}
 		}
 		
-		System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxPonderations.keySet());
+		if(log==0) {
+			System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxPonderations.keySet());
+		}
 		
 		creneauxPonderations = sortByValue(creneauxPonderations);
 		dispoCandide = sortByValue(dispoCandide);
 
-		System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxPonderations.keySet());
-
+		if(log==0) {
+			System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxPonderations.keySet());
+		}
+		
 		for(int periode : creneauxPonderations.keySet()) {
 			for(Acteur act: dispoCandide.keySet()) {
-				System.err.println(act);
+				if(log==0) {
+					System.err.println(act);
+				}
 				c = (Enseignant)act;
 				if(c.getDisponibilites().get(periode)) {
 					if(planning.get(periode).size()<nbSalles) {
@@ -409,14 +419,16 @@ public class Planning implements Initializable {
 	
 	public void openJeuDonnees() {
 
-		System.err.println(listSalles.getItems());
+		//System.err.println(listSalles.getItems());
 		File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-            System.err.println(file.getAbsolutePath());
+            //System.err.println(file.getAbsolutePath());
             CSVParser parser = new CSVParser();
             int checkData = parser.checkData(file.getAbsolutePath());
             if(checkData > 0) {
-            	System.err.println("OK " + checkData + " insertions");
+            	if(log==0) {
+            		System.err.println("OK " + checkData + " insertions");
+            	}
                 pathDonnees = file.getAbsolutePath();
 				FadeTransition ft = new FadeTransition(Duration.millis(1000), ok1);
 				ft.setFromValue(0.0);
@@ -436,7 +448,9 @@ public class Planning implements Initializable {
 				ft3.play();
             }
             else {
-            	System.err.println("NOK " + checkData);
+            	if(log==0) {
+            		System.err.println("NOK " + checkData);
+            	}
             	// If < 0, shows a mistake
 				nok1.setText("Échec, fichier non valide");
 				FadeTransition ft = new FadeTransition(Duration.millis(1000), nok1);
@@ -463,11 +477,15 @@ public class Planning implements Initializable {
 	public void openContraintesEns() {
 		File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-            System.err.println(file.getAbsolutePath());
+        	if(log==0) {
+        		System.err.println(file.getAbsolutePath());
+        	}
             CSVParser parser = new CSVParser();
             int checkData = parser.checkContraintes(file.getAbsolutePath());
             if(checkData < 0) {
-            	System.err.println("OK pour les contraintes enseignants");
+            	if(log==0) {
+            		System.err.println("OK pour les contraintes enseignants");
+            	}
                 pathContraintesEns = file.getAbsolutePath();
 				FadeTransition ft = new FadeTransition(Duration.millis(1000), ok2);
 				ft.setFromValue(0.0);
@@ -488,7 +506,9 @@ public class Planning implements Initializable {
 
             }
             else {
-            	System.err.println("NOK ligne " + checkData+1);
+            	if(log==0) {
+            		System.err.println("NOK ligne " + checkData+1);
+            	}
             	// If > 0, it means error on this line, we add one because count starts from zero in dev
 				FadeTransition ft = new FadeTransition(Duration.millis(1000), nok2);
 				ft.setFromValue(0.0);
@@ -515,11 +535,15 @@ public class Planning implements Initializable {
 	public void openContraintesTut() {
 		File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-            System.err.println(file.getAbsolutePath());
+        	if(log==0) {
+        		System.err.println(file.getAbsolutePath());
+        	}
             CSVParser parser = new CSVParser();
             int checkData = parser.checkContraintes(file.getAbsolutePath());
             if(checkData < 0) {
-            	System.err.println("OK pour les contraintes tuteurs");
+            	if(log==0) {
+            		System.err.println("OK pour les contraintes tuteurs");
+            	}
                 pathContraintesTut = file.getAbsolutePath();
 				FadeTransition ft = new FadeTransition(Duration.millis(1000), ok3);
 				ft.setFromValue(0.0);
@@ -539,7 +563,9 @@ public class Planning implements Initializable {
 				ft3.play();
             }
             else {
-            	System.err.println(checkData+1);
+            	if(log==0) {
+            		System.err.println(checkData+1);
+            	}
             	// If > 0, it means error on this line, we add one because count starts from zero in dev
 				FadeTransition ft = new FadeTransition(Duration.millis(1000), nok3);
 				ft.setFromValue(0.0);
