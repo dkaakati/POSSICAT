@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -49,7 +50,7 @@ public class Planning implements Initializable {
 		nbSalles; // Nombre de salles disponibles
 	boolean isFinised = false;
 	int nbInserted = 0;
-	int log = 2;
+	int log = 0;
 
 	@FXML
 	private ListView<String> listSalles;
@@ -62,9 +63,9 @@ public class Planning implements Initializable {
 	List<Student> etudiants = new ArrayList<Student>();
 	Map<Integer, List<Creneau>> planning;
 	
-	private String pathDonnees = "";
-	private String pathContraintesEns = "";
-	private String pathContraintesTut = "";
+	private String pathDonnees = "C:\\Users\\THIB\\Documents\\projetYOLO\\POSSICAT\\POSSICAT\\data\\donneesLite2.csv";
+	private String pathContraintesEns = "C:\\Users\\THIB\\Documents\\projetYOLO\\POSSICAT\\POSSICAT\\data\\contraintesEnsLite2.csv";
+	private String pathContraintesTut = "C:\\Users\\THIB\\Documents\\projetYOLO\\POSSICAT\\POSSICAT\\data\\contraintesTuteurLite2.csv";
 
 	private Stage stage;
 	private Desktop desktop = Desktop.getDesktop();
@@ -273,6 +274,16 @@ public class Planning implements Initializable {
 			return null;
 		}
 		
+		Iterator<Integer> it = creneauxCommuns.iterator();
+		while(it.hasNext()) {
+			int res = it.next()%8;
+			if(res==0 || res==1 || res==6 || res==7) {
+				it.remove();
+			}
+		}
+		
+		System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxCommuns);
+		
 		List<Acteur> listeCandide = new ArrayList<Acteur>(enseignants.list);
 		listeCandide.remove(e);
 		Enseignant c = null;
@@ -280,6 +291,44 @@ public class Planning implements Initializable {
 		if(log==0) {
 			System.err.println(listeCandide);
 		}
+		
+		while(!listeCandide.isEmpty()) {
+			
+			for(Acteur act: listeCandide) {
+				Enseignant a = (Enseignant)act;
+				// On récupère le candide a qui il reste le plus de soutenances a voir
+				if(c == null || a.getNbSoutenancesCandide()>c.getNbSoutenancesCandide()) {
+					c = a;
+				}
+			}
+			for(int periode : creneauxCommuns) {
+				if(c.getDisponibilites().get(periode)) {
+					// Vérifier si une salle est disponible
+					System.err.println("SALLES DISPO " + planning.get(periode).size());
+					if(planning.get(periode).size()<nbSalles) {
+						return new Creneau(periode, e, c, t, s);
+					}
+				}
+			}
+			listeCandide.remove(c);
+			c = null;
+		}
+		
+		for(int p : periodes) {
+			if(dispoEnseignant.get(p) && dispoTuteur.get(p)) {
+				creneauxCommuns.add(p);
+			}
+		}
+		
+		listeCandide = new ArrayList<Acteur>(enseignants.list);
+		listeCandide.remove(e);
+		c = null;
+		
+		if(log==0) {
+			System.err.println(listeCandide);
+		}
+		
+		System.err.println("CVOUCOU");
 		
 		while(!listeCandide.isEmpty()) {
 			
