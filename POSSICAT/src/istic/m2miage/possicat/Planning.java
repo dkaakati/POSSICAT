@@ -7,13 +7,20 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -253,72 +260,90 @@ public class Planning implements Initializable {
 		Map<Integer, Boolean> dispoEnseignant = e.getDisponibilites();
 		Map<Integer, Boolean> dispoTuteur = t.getDisponibilites();
 
-		List<Integer> creneauxCommuns = new ArrayList<Integer>();
+		Map<Integer, Integer> creneauxPonderations = new HashMap<Integer, Integer>();
 
-		if(dispoEnseignant == null || dispoTuteur == null) {
-			return null;
+		Set<Integer> dispoEns = dispoEnseignant.keySet();
+		for(int p : dispoEns) {
+			if(dispoEnseignant.get(p) && dispoTuteur.get(p)) {
+				creneauxPonderations.put(p, 0);
+			}
 		}
 
+		// Contrainte selon les horaires des soutenances
+		Set<Integer> periodes = creneauxPonderations.keySet();
+		for(int periode : periodes) {
+			int res = periode%8;
+			if(res==3 || res==4) {
+				creneauxPonderations.put(periode, 1);
+			} else if (res==2 || res==5) {
+				creneauxPonderations.put(periode, 2);
+			} else if (res==1 || res==6) {
+				creneauxPonderations.put(periode, 3);
+			} else if (res==0 || res==7) {
+				creneauxPonderations.put(periode, 5);
+			}
+		}
 		
+		// Contraintes selon les soutenances des tuteurs
+		
+		for(int periode : periodes) {
+			if((periode%8)!=0) {
+				List<Creneau> avant = planning.get(periode-1);
+				for(Creneau c : avant) {
+					if(c.getTuteur() == t) {
+						creneauxPonderations.put(periode, 0);
+					}
+				}
+			}
+			if((periode%8)!=7) {
+				List<Creneau> apres = planning.get(periode+1);
+				for(Creneau c : apres) {
+					if(c.getTuteur() == t) {
+						creneauxPonderations.put(periode, 0);
+					}
+				}
+			}
+			System.err.println("Periode " + periode + " Pondération " + creneauxPonderations.get(periode));
+		}
+		
+		System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxPonderations.keySet());
+		
+		creneauxPonderations = sortByValue(creneauxPonderations);
+
+		System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxPonderations.keySet());
+
+		List<Acteur> listeCandide = new ArrayList<Acteur>(enseignants.list);
+		listeCandide.remove(e);
+		Enseignant c = null;
 
 		if(log==0) {
-			System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxCommuns);
+			System.err.println(listeCandide);
 		}
-		
-		int resATesterMatin = 3;
-		int resATesterAprem = 4;
-		for (int i =0; i<4; i++){
-			
-			Set<Integer> periodes = dispoEnseignant.keySet();
-			for(int p : periodes) {
-				if(dispoEnseignant.get(p) && dispoTuteur.get(p)) {
-					creneauxCommuns.add(p);
+
+		while(!listeCandide.isEmpty()) {
+
+			for(Acteur act: listeCandide) {
+				Enseignant a = (Enseignant)act;
+				// On récupère le candide a qui il reste le plus de soutenances a voir
+				if(c == null || a.getNbSoutenancesCandide()>c.getNbSoutenancesCandide()) {
+					c = a;
 				}
 			}
-
-			Iterator<Integer> it = creneauxCommuns.iterator();
-			while(it.hasNext()) {
-				int res = it.next()%8;
-				if( res<resATesterMatin || res>resATesterAprem ) {
-					it.remove();
-				}
-				
-			}
-
-			System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxCommuns);
-
-			List<Acteur> listeCandide = new ArrayList<Acteur>(enseignants.list);
-			listeCandide.remove(e);
-			Enseignant c = null;
-
-			if(log==0) {
-				System.err.println(listeCandide);
-			}
-
-			while(!listeCandide.isEmpty()) {
-
-				for(Acteur act: listeCandide) {
-					Enseignant a = (Enseignant)act;
-					// On récupère le candide a qui il reste le plus de soutenances a voir
-					if(c == null || a.getNbSoutenancesCandide()>c.getNbSoutenancesCandide()) {
-						c = a;
+			for(int periode : creneauxPonderations.keySet()) {
+				if(c.getDisponibilites().get(periode)) {
+					// Vérifier si une salle est disponible
+					System.err.println("SALLES DISPO " + planning.get(periode).size());
+					if(planning.get(periode).size()<nbSalles) {
+						return new Creneau(periode, e, c, t, s);
 					}
 				}
-				for(int periode : creneauxCommuns) {
-					if(c.getDisponibilites().get(periode)) {
-						// Vérifier si une salle est disponible
-						System.err.println("SALLES DISPO " + planning.get(periode).size());
-						if(planning.get(periode).size()<nbSalles) {
-							return new Creneau(periode, e, c, t, s);
-						}
-					}
-				}
-				listeCandide.remove(c);
-				c = null;
 			}
-			resATesterAprem++;
-			resATesterMatin--;
+			listeCandide.remove(c);
+			c = null;
 		}
+		//resATesterAprem++;
+		//resATesterMatin--;
+		//}
 		return null;
 	}
 
@@ -455,5 +480,18 @@ public class Planning implements Initializable {
 
 		return workDays;
 	}
+	
+	static <K, V extends Comparable<? super V>> Map<K, V> sortByValue( Map<K, V> map )
+	{
+	  Map<K,V> result = new LinkedHashMap<>();
+	 Stream <Entry<K,V>> st = map.entrySet().stream();
+
+	 st.sorted(Comparator.comparing(e -> e.getValue()))
+	      .forEachOrdered(e ->result.put(e.getKey(),e.getValue()));
+
+	 return result;
+	}
 
 }
+
+
