@@ -42,12 +42,12 @@ public class Planning implements Initializable {
 
 	@FXML
 	DatePicker 	dateDebut = new DatePicker(), 
-				dateFin = new DatePicker();
+	dateFin = new DatePicker();
 
 	int nbJours, // Nombre de jours ouvrés
-		nbPeriodesParJour,
-		nbPeriodesEnTout,
-		nbSalles; // Nombre de salles disponibles
+	nbPeriodesParJour,
+	nbPeriodesEnTout,
+	nbSalles; // Nombre de salles disponibles
 	boolean isFinised = false;
 	int nbInserted = 0;
 	int log = 0;
@@ -57,49 +57,49 @@ public class Planning implements Initializable {
 
 	protected ListProperty<String> listProperty = new SimpleListProperty<>();
 	protected List<String> salles = new ArrayList<>();
-	
+
 	ListActeur enseignants = new ListActeur();
 	ListActeur tuteurs = new ListActeur();
 	List<Student> etudiants = new ArrayList<Student>();
 	Map<Integer, List<Creneau>> planning;
-	
+
 	private String pathDonnees = "C:\\Users\\THIB\\Documents\\projetYOLO\\POSSICAT\\POSSICAT\\data\\donneesLite2.csv";
 	private String pathContraintesEns = "C:\\Users\\THIB\\Documents\\projetYOLO\\POSSICAT\\POSSICAT\\data\\contraintesEnsLite2.csv";
 	private String pathContraintesTut = "C:\\Users\\THIB\\Documents\\projetYOLO\\POSSICAT\\POSSICAT\\data\\contraintesTuteurLite2.csv";
 
 	private Stage stage;
 	private Desktop desktop = Desktop.getDesktop();
-	
+
 	final FileChooser fileChooser = new FileChooser();
-	
+
 
 	public Planning(Stage primaryStage) throws IOException {
 		this.stage = primaryStage;
 	};
 
 	public void readCSV() throws IOException {
-		
+
 		if(pathDonnees.isEmpty() || pathContraintesEns.isEmpty() || pathContraintesTut.isEmpty()) {
 			return;
 		}
-		
+
 		Date debut = Date.from(dateDebut.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
 		Date fin = Date.from(dateFin.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-		
+
 		nbJours = getWorkingDaysBetweenTwoDates(debut, fin)+1;
 		nbPeriodesParJour = 8;
-		
+
 		ObservableList<String> sallesSelectionnees = listSalles.getSelectionModel().getSelectedItems();
 		nbSalles = sallesSelectionnees.size();
 
 		nbPeriodesEnTout = nbPeriodesParJour*nbJours;
-		
+
 		planning = new HashMap<Integer, List<Creneau>>();
 		for(int periode = 0; periode < nbPeriodesEnTout ; periode++) {
 			List<Creneau> salles = new ArrayList<Creneau>();
 			planning.put(periode, salles);
 		}
-		
+
 		CSVParser parser = new CSVParser();
 		parser.readDispo(pathContraintesEns, Role.Enseignant, enseignants, nbPeriodesParJour);
 		parser.readDispo(pathContraintesTut, Role.Tuteur, tuteurs, nbPeriodesParJour);
@@ -117,20 +117,20 @@ public class Planning implements Initializable {
 		for(int i = 0; i < nbSoutenances; i++) {
 			insertData();
 		}
-		
+
 		Calendar c = Calendar.getInstance();
 		c.set(dateDebut.getValue().getYear(), dateDebut.getValue().getMonthValue(), dateDebut.getValue().getDayOfMonth());
-		
+
 		parser.writeData(planning, sallesSelectionnees, c, nbPeriodesParJour);
 
 		desktop.open(new File(System.getProperty("user.home")+"/Downloads/generatedCSV.csv"));
 
-		
+
 	}
-	
+
 	public void insertData() {
 		boolean inserted = false;
-		
+
 		if(log==0) {
 			System.err.println("On récupère l'acteur le moins disponible (enseignant ou tuteur)");
 		}
@@ -146,12 +146,12 @@ public class Planning implements Initializable {
 			System.err.println("");
 			System.err.println("On récupère les acteurs en relations les moins disponibles");
 		}
-		
+
 		ListActeur l = new ListActeur(act.getRelations());
 		if(log==0) {
 			System.err.println("Liste des acteurs en relation avec " + act + " => " + l);
 		}
-		
+
 		while(!inserted) {
 			if(l.list.isEmpty()) {
 				if(log==0) {
@@ -159,7 +159,7 @@ public class Planning implements Initializable {
 				}
 				new Exception("On génère une exception");
 			}
-			
+
 			act = l.getActeurLeMoinsDisponible();
 			if(log==0) {
 				System.err.println("On teste avec " + act);
@@ -182,7 +182,7 @@ public class Planning implements Initializable {
 				l.list.remove(act);
 			} else {
 				inserted = true;
-				
+
 				if(log==0 || log==1) {
 					System.err.println(nbInserted + "\n-----------------");
 					System.err.println("\tEtudiant " + c.getStudent());
@@ -191,14 +191,14 @@ public class Planning implements Initializable {
 					System.err.println("\tCandide " + c.getCandide());
 					System.err.println("\tA la période " + c.getPeriode());
 				}
-				
+
 				e.addDisponibilite(c.getPeriode());
 				t.addDisponibilite(c.getPeriode());
 				c.getCandide().addDisponibiliteCandide(c.getPeriode());
-				
+
 				e.removeRelation(t);
 				t.removeRelation(e);
-				
+
 				if(e.aFaitToutesLesSoutenances()) {
 					enseignants.list.remove(e);
 				}
@@ -208,17 +208,17 @@ public class Planning implements Initializable {
 				if(c.getCandide().aFaitToutesLesSoutenances()) {
 					enseignants.list.remove(c.getCandide());
 				}
-				
+
 				insertCreneauInPlanning(c);
-				
+
 				nbInserted++;
 			}
 		}
 	}
-	
+
 	private void insertCreneauInPlanning(Creneau c) {
 		List<Creneau> salles = planning.get(c.getPeriode());
-		
+
 		int size = salles.size();
 		c.setSalle(size+1);
 		salles.add(c);
@@ -235,123 +235,90 @@ public class Planning implements Initializable {
 	}
 
 	public Acteur getActeurLeMoinsDisponible() {
-		
+
 		Acteur e = enseignants.getActeurLeMoinsDisponible();
 		Acteur t = tuteurs.getActeurLeMoinsDisponible();
-		
+
 		if(e.getDisponibilitesSoutenances()<t.getDisponibilitesSoutenances()) {
 			return e;
 		} else {
 			return t;
 		}
 	}
-	
+
 	public Creneau creneauCommun(Enseignant e, Tuteur t, Student s) {
 		if(log==0) {
 			System.err.println(e + " " + t);
 		}
 		Map<Integer, Boolean> dispoEnseignant = e.getDisponibilites();
 		Map<Integer, Boolean> dispoTuteur = t.getDisponibilites();
-		
+
 		List<Integer> creneauxCommuns = new ArrayList<Integer>();
-		
+
 		if(dispoEnseignant == null || dispoTuteur == null) {
 			return null;
 		}
+
 		
-		Set<Integer> periodes = dispoEnseignant.keySet();
-		for(int p : periodes) {
-			if(dispoEnseignant.get(p) && dispoTuteur.get(p)) {
-				creneauxCommuns.add(p);
-			}
-		}
-		
+
 		if(log==0) {
 			System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxCommuns);
 		}
 		
-		if(creneauxCommuns.isEmpty()) {
-			return null;
-		}
-		
-		Iterator<Integer> it = creneauxCommuns.iterator();
-		while(it.hasNext()) {
-			int res = it.next()%8;
-			if(res==0 || res==1 || res==6 || res==7) {
-				it.remove();
-			}
-		}
-		
-		System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxCommuns);
-		
-		List<Acteur> listeCandide = new ArrayList<Acteur>(enseignants.list);
-		listeCandide.remove(e);
-		Enseignant c = null;
-		
-		if(log==0) {
-			System.err.println(listeCandide);
-		}
-		
-		while(!listeCandide.isEmpty()) {
+		int resATesterMatin = 3;
+		int resATesterAprem = 4;
+		for (int i =0; i<4; i++){
 			
-			for(Acteur act: listeCandide) {
-				Enseignant a = (Enseignant)act;
-				// On récupère le candide a qui il reste le plus de soutenances a voir
-				if(c == null || a.getNbSoutenancesCandide()>c.getNbSoutenancesCandide()) {
-					c = a;
+			Set<Integer> periodes = dispoEnseignant.keySet();
+			for(int p : periodes) {
+				if(dispoEnseignant.get(p) && dispoTuteur.get(p)) {
+					creneauxCommuns.add(p);
 				}
 			}
-			for(int periode : creneauxCommuns) {
-				if(c.getDisponibilites().get(periode)) {
-					// Vérifier si une salle est disponible
-					System.err.println("SALLES DISPO " + planning.get(periode).size());
-					if(planning.get(periode).size()<nbSalles) {
-						return new Creneau(periode, e, c, t, s);
-					}
-				}
-			}
-			listeCandide.remove(c);
-			c = null;
-		}
-		
-		for(int p : periodes) {
-			if(dispoEnseignant.get(p) && dispoTuteur.get(p)) {
-				creneauxCommuns.add(p);
-			}
-		}
-		
-		listeCandide = new ArrayList<Acteur>(enseignants.list);
-		listeCandide.remove(e);
-		c = null;
-		
-		if(log==0) {
-			System.err.println(listeCandide);
-		}
-		
-		System.err.println("CVOUCOU");
-		
-		while(!listeCandide.isEmpty()) {
-			
-			for(Acteur act: listeCandide) {
-				Enseignant a = (Enseignant)act;
-				// On récupère le candide a qui il reste le plus de soutenances a voir
-				if(c == null || a.getNbSoutenancesCandide()>c.getNbSoutenancesCandide()) {
-					c = a;
-				}
-			}
-			for(int periode : creneauxCommuns) {
-				if(c.getDisponibilites().get(periode)) {
-					// Vérifier si une salle est disponible
-					System.err.println("SALLES DISPO " + planning.get(periode).size());
-					if(planning.get(periode).size()<nbSalles) {
-						return new Creneau(periode, e, c, t, s);
-					}
-				}
-			}
-			listeCandide.remove(c);
-			c = null;
-		}
 
+			Iterator<Integer> it = creneauxCommuns.iterator();
+			while(it.hasNext()) {
+				int res = it.next()%8;
+				if( res<resATesterMatin || res>resATesterAprem ) {
+					it.remove();
+				}
+				
+			}
+
+			System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxCommuns);
+
+			List<Acteur> listeCandide = new ArrayList<Acteur>(enseignants.list);
+			listeCandide.remove(e);
+			Enseignant c = null;
+
+			if(log==0) {
+				System.err.println(listeCandide);
+			}
+
+			while(!listeCandide.isEmpty()) {
+
+				for(Acteur act: listeCandide) {
+					Enseignant a = (Enseignant)act;
+					// On récupère le candide a qui il reste le plus de soutenances a voir
+					if(c == null || a.getNbSoutenancesCandide()>c.getNbSoutenancesCandide()) {
+						c = a;
+					}
+				}
+				for(int periode : creneauxCommuns) {
+					if(c.getDisponibilites().get(periode)) {
+						// Vérifier si une salle est disponible
+						System.err.println("SALLES DISPO " + planning.get(periode).size());
+						if(planning.get(periode).size()<nbSalles) {
+							return new Creneau(periode, e, c, t, s);
+						}
+					}
+				}
+				listeCandide.remove(c);
+				c = null;
+			}
+			resATesterAprem++;
+			resATesterMatin--;
+		}
 		return null;
 	}
 
@@ -370,7 +337,7 @@ public class Planning implements Initializable {
 		listSalles.itemsProperty().bind(listProperty);
 		listSalles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		listProperty.set(FXCollections.observableArrayList(salles));
-		
+
 		/**
 		 * Gestion des dates
 		 */
@@ -396,97 +363,97 @@ public class Planning implements Initializable {
 		help3.getItems().setAll(helpPopup3);
 
 	}
-	
+
 	public void validDate() {
 		Calendar c = Calendar.getInstance();
 		c.set(dateDebut.getValue().getYear(), dateDebut.getValue().getMonthValue(), dateDebut.getValue().getDayOfMonth());
 		c.add(Calendar.DATE, 4);
 		dateFin.setValue(LocalDate.of(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)));
 	}
-	
+
 	public void openJeuDonnees() {
 
 		System.err.println(listSalles.getItems());
 		File file = fileChooser.showOpenDialog(stage);
-        if (file != null) {
-            System.err.println(file.getAbsolutePath());
-            CSVParser parser = new CSVParser();
-            int checkData = parser.checkData(file.getAbsolutePath());
-            if(checkData > 0) {
-            	System.err.println("OK " + checkData + " insertions");
-                pathDonnees = file.getAbsolutePath();
-            }
-            else {
-            	System.err.println("NOK " + checkData);
-            	// If < 0, shows a mistake
-            }
+		if (file != null) {
+			System.err.println(file.getAbsolutePath());
+			CSVParser parser = new CSVParser();
+			int checkData = parser.checkData(file.getAbsolutePath());
+			if(checkData > 0) {
+				System.err.println("OK " + checkData + " insertions");
+				pathDonnees = file.getAbsolutePath();
+			}
+			else {
+				System.err.println("NOK " + checkData);
+				// If < 0, shows a mistake
+			}
 
-        }
+		}
 	}
-	
+
 	public void openContraintesEns() {
 		File file = fileChooser.showOpenDialog(stage);
-        if (file != null) {
-            System.err.println(file.getAbsolutePath());
-            CSVParser parser = new CSVParser();
-            int checkData = parser.checkContraintes(file.getAbsolutePath());
-            if(checkData < 0) {
-            	System.err.println("OK pour les contraintes enseignants");
-                pathContraintesEns = file.getAbsolutePath();
-            }
-            else {
-            	System.err.println("NOK ligne " + checkData+1);
-            	// If > 0, it means error on this line, we add one because count starts from zero in dev
-            }
+		if (file != null) {
+			System.err.println(file.getAbsolutePath());
+			CSVParser parser = new CSVParser();
+			int checkData = parser.checkContraintes(file.getAbsolutePath());
+			if(checkData < 0) {
+				System.err.println("OK pour les contraintes enseignants");
+				pathContraintesEns = file.getAbsolutePath();
+			}
+			else {
+				System.err.println("NOK ligne " + checkData+1);
+				// If > 0, it means error on this line, we add one because count starts from zero in dev
+			}
 
-        }
+		}
 	}
-	
+
 	public void openContraintesTut() {
 		File file = fileChooser.showOpenDialog(stage);
-        if (file != null) {
-            System.err.println(file.getAbsolutePath());
-            CSVParser parser = new CSVParser();
-            int checkData = parser.checkContraintes(file.getAbsolutePath());
-            if(checkData < 0) {
-            	System.err.println("OK pour les contraintes tuteurs");
-                pathContraintesTut = file.getAbsolutePath();
-            }
-            else {
-            	System.err.println(checkData+1);
-            	// If > 0, it means error on this line, we add one because count starts from zero in dev
-            }
-        }
+		if (file != null) {
+			System.err.println(file.getAbsolutePath());
+			CSVParser parser = new CSVParser();
+			int checkData = parser.checkContraintes(file.getAbsolutePath());
+			if(checkData < 0) {
+				System.err.println("OK pour les contraintes tuteurs");
+				pathContraintesTut = file.getAbsolutePath();
+			}
+			else {
+				System.err.println(checkData+1);
+				// If > 0, it means error on this line, we add one because count starts from zero in dev
+			}
+		}
 	}
-	
+
 	public int getWorkingDaysBetweenTwoDates(Date startDate, Date endDate) {
-	    Calendar startCal;
-	    Calendar endCal;
-	    startCal = Calendar.getInstance();
-	    startCal.setTime(startDate);
-	    endCal = Calendar.getInstance();
-	    endCal.setTime(endDate);
-	    int workDays = 0;
-	 
-	    //Return 0 if start and end are the same
-	    if (startCal.getTimeInMillis() == endCal.getTimeInMillis()) {
-	        return 0;
-	    }
-	 
-	    if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
-	        startCal.setTime(endDate);
-	        endCal.setTime(startDate);
-	    }
-	 
-	    do {
-	        startCal.add(Calendar.DAY_OF_MONTH, 1);
-	        if (startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY 
-	       && startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
-	            ++workDays;
-	        }
-	    } while (startCal.getTimeInMillis() < endCal.getTimeInMillis());
-	 
-	    return workDays;
+		Calendar startCal;
+		Calendar endCal;
+		startCal = Calendar.getInstance();
+		startCal.setTime(startDate);
+		endCal = Calendar.getInstance();
+		endCal.setTime(endDate);
+		int workDays = 0;
+
+		//Return 0 if start and end are the same
+		if (startCal.getTimeInMillis() == endCal.getTimeInMillis()) {
+			return 0;
+		}
+
+		if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
+			startCal.setTime(endDate);
+			endCal.setTime(startDate);
+		}
+
+		do {
+			startCal.add(Calendar.DAY_OF_MONTH, 1);
+			if (startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY 
+					&& startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+				++workDays;
+			}
+		} while (startCal.getTimeInMillis() < endCal.getTimeInMillis());
+
+		return workDays;
 	}
 
 }
