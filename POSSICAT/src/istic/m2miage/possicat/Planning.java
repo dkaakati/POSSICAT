@@ -7,36 +7,32 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Stream;
 
+import javafx.animation.FadeTransition;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SelectionMode;
+import javafx.scene.Group;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class Planning implements Initializable {
 
@@ -46,67 +42,92 @@ public class Planning implements Initializable {
 	MenuButton help2;
 	@FXML
 	MenuButton help3;
+	@FXML
+	Text ok1;
+	@FXML
+	Text nok1;
+	@FXML
+	Text ok2;
+	@FXML
+	Text nok2;
+	@FXML
+	Text ok3;
+	@FXML
+	Text nok3;
+	@FXML
+	Group step1;
+	@FXML
+	Group step2;
+	@FXML
+	Group step3;
+	@FXML
+	Group step4;
+	@FXML
+	Group step5;
+	@FXML
+	Button generateBtn;
+
 
 	@FXML
 	DatePicker 	dateDebut = new DatePicker(), 
-	dateFin = new DatePicker();
+				dateFin = new DatePicker();
 
 	int nbJours, // Nombre de jours ouvrés
-	nbPeriodesParJour,
-	nbPeriodesEnTout,
-	nbSalles; // Nombre de salles disponibles
+		nbPeriodesParJour,
+		nbPeriodesEnTout,
+		nbSalles; // Nombre de salles disponibles
 	boolean isFinised = false;
 	int nbInserted = 0;
-	int log = 0;
+	int log = 2;
 
 	@FXML
 	private ListView<String> listSalles;
 
 	protected ListProperty<String> listProperty = new SimpleListProperty<>();
 	protected List<String> salles = new ArrayList<>();
-
+	
 	ListActeur enseignants = new ListActeur();
 	ListActeur tuteurs = new ListActeur();
 	List<Student> etudiants = new ArrayList<Student>();
 	Map<Integer, List<Creneau>> planning;
-
-	private String pathDonnees = "C:\\Users\\THIB\\Documents\\projetYOLO\\POSSICAT\\POSSICAT\\data\\donneesLite2.csv";
-	private String pathContraintesEns = "C:\\Users\\THIB\\Documents\\projetYOLO\\POSSICAT\\POSSICAT\\data\\contraintesEnsLite2.csv";
-	private String pathContraintesTut = "C:\\Users\\THIB\\Documents\\projetYOLO\\POSSICAT\\POSSICAT\\data\\contraintesTuteurLite2.csv";
+	
+	private String pathDonnees = "";
+	private String pathContraintesEns = "";
+	private String pathContraintesTut = "";
 
 	private Stage stage;
 	private Desktop desktop = Desktop.getDesktop();
-
+	
 	final FileChooser fileChooser = new FileChooser();
-
+	
 
 	public Planning(Stage primaryStage) throws IOException {
 		this.stage = primaryStage;
 	};
 
 	public void readCSV() throws IOException {
-
+		
 		if(pathDonnees.isEmpty() || pathContraintesEns.isEmpty() || pathContraintesTut.isEmpty()) {
 			return;
 		}
-
+		
 		Date debut = Date.from(dateDebut.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
 		Date fin = Date.from(dateFin.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-
+		
 		nbJours = getWorkingDaysBetweenTwoDates(debut, fin)+1;
 		nbPeriodesParJour = 8;
-
+		
 		ObservableList<String> sallesSelectionnees = listSalles.getSelectionModel().getSelectedItems();
 		nbSalles = sallesSelectionnees.size();
 
 		nbPeriodesEnTout = nbPeriodesParJour*nbJours;
-
+		
 		planning = new HashMap<Integer, List<Creneau>>();
 		for(int periode = 0; periode < nbPeriodesEnTout ; periode++) {
 			List<Creneau> salles = new ArrayList<Creneau>();
 			planning.put(periode, salles);
 		}
-
+		
 		CSVParser parser = new CSVParser();
 		parser.readDispo(pathContraintesEns, Role.Enseignant, enseignants, nbPeriodesParJour);
 		parser.readDispo(pathContraintesTut, Role.Tuteur, tuteurs, nbPeriodesParJour);
@@ -124,20 +145,20 @@ public class Planning implements Initializable {
 		for(int i = 0; i < nbSoutenances; i++) {
 			insertData();
 		}
-
+		
 		Calendar c = Calendar.getInstance();
 		c.set(dateDebut.getValue().getYear(), dateDebut.getValue().getMonthValue(), dateDebut.getValue().getDayOfMonth());
-
+		
 		parser.writeData(planning, sallesSelectionnees, c, nbPeriodesParJour);
 
 		desktop.open(new File(System.getProperty("user.home")+"/Downloads/generatedCSV.csv"));
 
-
+		
 	}
-
+	
 	public void insertData() {
 		boolean inserted = false;
-
+		
 		if(log==0) {
 			System.err.println("On récupère l'acteur le moins disponible (enseignant ou tuteur)");
 		}
@@ -153,12 +174,12 @@ public class Planning implements Initializable {
 			System.err.println("");
 			System.err.println("On récupère les acteurs en relations les moins disponibles");
 		}
-
+		
 		ListActeur l = new ListActeur(act.getRelations());
 		if(log==0) {
 			System.err.println("Liste des acteurs en relation avec " + act + " => " + l);
 		}
-
+		
 		while(!inserted) {
 			if(l.list.isEmpty()) {
 				if(log==0) {
@@ -166,7 +187,7 @@ public class Planning implements Initializable {
 				}
 				new Exception("On génère une exception");
 			}
-
+			
 			act = l.getActeurLeMoinsDisponible();
 			if(log==0) {
 				System.err.println("On teste avec " + act);
@@ -189,7 +210,7 @@ public class Planning implements Initializable {
 				l.list.remove(act);
 			} else {
 				inserted = true;
-
+				
 				if(log==0 || log==1) {
 					System.err.println(nbInserted + "\n-----------------");
 					System.err.println("\tEtudiant " + c.getStudent());
@@ -198,14 +219,14 @@ public class Planning implements Initializable {
 					System.err.println("\tCandide " + c.getCandide());
 					System.err.println("\tA la période " + c.getPeriode());
 				}
-
+				
 				e.addDisponibilite(c.getPeriode());
 				t.addDisponibilite(c.getPeriode());
 				c.getCandide().addDisponibiliteCandide(c.getPeriode());
-
+				
 				e.removeRelation(t);
 				t.removeRelation(e);
-
+				
 				if(e.aFaitToutesLesSoutenances()) {
 					enseignants.list.remove(e);
 				}
@@ -215,17 +236,17 @@ public class Planning implements Initializable {
 				if(c.getCandide().aFaitToutesLesSoutenances()) {
 					enseignants.list.remove(c.getCandide());
 				}
-
+				
 				insertCreneauInPlanning(c);
-
+				
 				nbInserted++;
 			}
 		}
 	}
-
+	
 	private void insertCreneauInPlanning(Creneau c) {
 		List<Creneau> salles = planning.get(c.getPeriode());
-
+		
 		int size = salles.size();
 		c.setSalle(size+1);
 		salles.add(c);
@@ -242,17 +263,17 @@ public class Planning implements Initializable {
 	}
 
 	public Acteur getActeurLeMoinsDisponible() {
-
+		
 		Acteur e = enseignants.getActeurLeMoinsDisponible();
 		Acteur t = tuteurs.getActeurLeMoinsDisponible();
-
+		
 		if(e.getDisponibilitesSoutenances()<t.getDisponibilitesSoutenances()) {
 			return e;
 		} else {
 			return t;
 		}
 	}
-
+	
 	public Creneau creneauCommun(Enseignant e, Tuteur t, Student s) {
 		if(log==0) {
 			System.err.println(e + " " + t);
@@ -362,7 +383,7 @@ public class Planning implements Initializable {
 		listSalles.itemsProperty().bind(listProperty);
 		listSalles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		listProperty.set(FXCollections.observableArrayList(salles));
-
+		
 		/**
 		 * Gestion des dates
 		 */
@@ -388,97 +409,207 @@ public class Planning implements Initializable {
 		help3.getItems().setAll(helpPopup3);
 
 	}
-
+	
 	public void validDate() {
 		Calendar c = Calendar.getInstance();
 		c.set(dateDebut.getValue().getYear(), dateDebut.getValue().getMonthValue(), dateDebut.getValue().getDayOfMonth());
 		c.add(Calendar.DATE, 4);
 		dateFin.setValue(LocalDate.of(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)));
 	}
-
+	
 	public void openJeuDonnees() {
 
 		System.err.println(listSalles.getItems());
 		File file = fileChooser.showOpenDialog(stage);
-		if (file != null) {
-			System.err.println(file.getAbsolutePath());
-			CSVParser parser = new CSVParser();
-			int checkData = parser.checkData(file.getAbsolutePath());
-			if(checkData > 0) {
-				System.err.println("OK " + checkData + " insertions");
-				pathDonnees = file.getAbsolutePath();
-			}
-			else {
-				System.err.println("NOK " + checkData);
-				// If < 0, shows a mistake
-			}
+        if (file != null) {
+            System.err.println(file.getAbsolutePath());
+            CSVParser parser = new CSVParser();
+            int checkData = parser.checkData(file.getAbsolutePath());
+            if(checkData > 0) {
+            	System.err.println("OK " + checkData + " insertions");
+                pathDonnees = file.getAbsolutePath();
+				FadeTransition ft = new FadeTransition(Duration.millis(1000), ok1);
+				ft.setFromValue(0.0);
+				ft.setToValue(1.0);
+				ft.play();
+				ok1.setText("Succès, "+checkData+" soutenances importées");
 
-		}
+				// On passe à l'étape 2
+				FadeTransition ft2 = new FadeTransition(Duration.millis(1000), step1);
+				ft2.setFromValue(1.0);
+				ft2.setToValue(0.5);
+				ft2.play();
+				step2.setDisable(false);
+				FadeTransition ft3 = new FadeTransition(Duration.millis(1000), step2);
+				ft3.setFromValue(0.5);
+				ft3.setToValue(1.0);
+				ft3.play();
+            }
+            else {
+            	System.err.println("NOK " + checkData);
+            	// If < 0, shows a mistake
+				nok1.setText("Échec, fichier non valide");
+				FadeTransition ft = new FadeTransition(Duration.millis(1000), nok1);
+				ft.setFromValue(0.0);
+				ft.setToValue(1.0);
+				ft.play();
+				new java.util.Timer().schedule(
+						new java.util.TimerTask() {
+							@Override
+							public void run() {
+								FadeTransition ft = new FadeTransition(Duration.millis(1000), nok1);
+								ft.setFromValue(1.0);
+								ft.setToValue(0.0);
+								ft.play();
+							}
+						},
+						3000
+				);
+            }
+
+        }
 	}
-
+	
 	public void openContraintesEns() {
 		File file = fileChooser.showOpenDialog(stage);
-		if (file != null) {
-			System.err.println(file.getAbsolutePath());
-			CSVParser parser = new CSVParser();
-			int checkData = parser.checkContraintes(file.getAbsolutePath());
-			if(checkData < 0) {
-				System.err.println("OK pour les contraintes enseignants");
-				pathContraintesEns = file.getAbsolutePath();
-			}
-			else {
-				System.err.println("NOK ligne " + checkData+1);
-				// If > 0, it means error on this line, we add one because count starts from zero in dev
-			}
+        if (file != null) {
+            System.err.println(file.getAbsolutePath());
+            CSVParser parser = new CSVParser();
+            int checkData = parser.checkContraintes(file.getAbsolutePath());
+            if(checkData < 0) {
+            	System.err.println("OK pour les contraintes enseignants");
+                pathContraintesEns = file.getAbsolutePath();
+				FadeTransition ft = new FadeTransition(Duration.millis(1000), ok2);
+				ft.setFromValue(0.0);
+				ft.setToValue(1.0);
+				ft.play();
+				ok2.setText("Succès");
 
-		}
+				// On passe à l'étape 3
+				FadeTransition ft3 = new FadeTransition(Duration.millis(1000), step2);
+				ft3.setFromValue(1.0);
+				ft3.setToValue(0.5);
+				ft3.play();
+				step3.setDisable(false);
+				FadeTransition ft4 = new FadeTransition(Duration.millis(1000), step3);
+				ft4.setFromValue(0.5);
+				ft4.setToValue(1.0);
+				ft4.play();
+
+            }
+            else {
+            	System.err.println("NOK ligne " + checkData+1);
+            	// If > 0, it means error on this line, we add one because count starts from zero in dev
+				FadeTransition ft = new FadeTransition(Duration.millis(1000), nok2);
+				ft.setFromValue(0.0);
+				ft.setToValue(1.0);
+				ft.play();
+				nok2.setText("Échec, erreur à la ligne "+checkData);
+				new java.util.Timer().schedule(
+						new java.util.TimerTask() {
+							@Override
+							public void run() {
+								FadeTransition ft = new FadeTransition(Duration.millis(1000), nok2);
+								ft.setFromValue(1.0);
+								ft.setToValue(0.0);
+								ft.play();
+							}
+						},
+						3000
+				);
+            }
+
+        }
 	}
-
+	
 	public void openContraintesTut() {
 		File file = fileChooser.showOpenDialog(stage);
-		if (file != null) {
-			System.err.println(file.getAbsolutePath());
-			CSVParser parser = new CSVParser();
-			int checkData = parser.checkContraintes(file.getAbsolutePath());
-			if(checkData < 0) {
-				System.err.println("OK pour les contraintes tuteurs");
-				pathContraintesTut = file.getAbsolutePath();
-			}
-			else {
-				System.err.println(checkData+1);
-				// If > 0, it means error on this line, we add one because count starts from zero in dev
-			}
-		}
+        if (file != null) {
+            System.err.println(file.getAbsolutePath());
+            CSVParser parser = new CSVParser();
+            int checkData = parser.checkContraintes(file.getAbsolutePath());
+            if(checkData < 0) {
+            	System.err.println("OK pour les contraintes tuteurs");
+                pathContraintesTut = file.getAbsolutePath();
+				FadeTransition ft = new FadeTransition(Duration.millis(1000), ok3);
+				ft.setFromValue(0.0);
+				ft.setToValue(1.0);
+				ft.play();
+				ok3.setText("Succès");
+
+				// On passe à l'étape 4
+				FadeTransition ft2 = new FadeTransition(Duration.millis(2000), step3);
+				ft2.setFromValue(1.0);
+				ft2.setToValue(0.5);
+				ft2.play();
+				step4.setDisable(false);
+				FadeTransition ft3 = new FadeTransition(Duration.millis(2000), step4);
+				ft3.setFromValue(0.5);
+				ft3.setToValue(1.0);
+				ft3.play();
+            }
+            else {
+            	System.err.println(checkData+1);
+            	// If > 0, it means error on this line, we add one because count starts from zero in dev
+				FadeTransition ft = new FadeTransition(Duration.millis(1000), nok3);
+				ft.setFromValue(0.0);
+				ft.setToValue(1.0);
+				ft.play();
+				nok3.setText("Échec, erreur à la ligne "+checkData);
+				new java.util.Timer().schedule(
+						new java.util.TimerTask() {
+							@Override
+							public void run() {
+								FadeTransition ft = new FadeTransition(Duration.millis(1000), nok3);
+								ft.setFromValue(1.0);
+								ft.setToValue(0.0);
+								ft.play();
+							}
+						},
+						3000
+				);
+            }
+        }
+	}
+	
+	public int getWorkingDaysBetweenTwoDates(Date startDate, Date endDate) {
+	    Calendar startCal;
+	    Calendar endCal;
+	    startCal = Calendar.getInstance();
+	    startCal.setTime(startDate);
+	    endCal = Calendar.getInstance();
+	    endCal.setTime(endDate);
+	    int workDays = 0;
+	 
+	    //Return 0 if start and end are the same
+	    if (startCal.getTimeInMillis() == endCal.getTimeInMillis()) {
+	        return 0;
+	    }
+	 
+	    if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
+	        startCal.setTime(endDate);
+	        endCal.setTime(startDate);
+	    }
+	 
+	    do {
+	        startCal.add(Calendar.DAY_OF_MONTH, 1);
+	        if (startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY 
+	       && startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+	            ++workDays;
+	        }
+	    } while (startCal.getTimeInMillis() < endCal.getTimeInMillis());
+	 
+	    return workDays;
 	}
 
-	public int getWorkingDaysBetweenTwoDates(Date startDate, Date endDate) {
-		Calendar startCal;
-		Calendar endCal;
-		startCal = Calendar.getInstance();
-		startCal.setTime(startDate);
-		endCal = Calendar.getInstance();
-		endCal.setTime(endDate);
-		int workDays = 0;
+	public void launchStep5() {
+		step5.setDisable(false);
+		step5.setOpacity(1.0);
+	}
 
-		//Return 0 if start and end are the same
-		if (startCal.getTimeInMillis() == endCal.getTimeInMillis()) {
-			return 0;
-		}
-
-		if (startCal.getTimeInMillis() > endCal.getTimeInMillis()) {
-			startCal.setTime(endDate);
-			endCal.setTime(startDate);
-		}
-
-		do {
-			startCal.add(Calendar.DAY_OF_MONTH, 1);
-			if (startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY 
-					&& startCal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
-				++workDays;
-			}
-		} while (startCal.getTimeInMillis() < endCal.getTimeInMillis());
-
-		return workDays;
+	public void launchStep6() {
+		generateBtn.setDisable(false);
+		generateBtn.setOpacity(1.0);
 	}
 	
 	static <K, V extends Comparable<? super V>> Map<K, V> sortByValue( Map<K, V> map )
@@ -493,5 +624,3 @@ public class Planning implements Initializable {
 	}
 
 }
-
-

@@ -13,69 +13,122 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<VBox prefHeight="450.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="450.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <AnchorPane maxHeight="-1.0" maxWidth="-1.0" minHeight="226.0" prefHeight="226.0" prefWidth="394.0" VBox.vgrow="ALWAYS">
          <children>
-            <Button fx:id="openBtn1" layoutX="106.0" layoutY="76.0" mnemonicParsing="false" onAction="#openJeuDonnees" text="Import CSV" />
-            <Text layoutX="112.0" layoutY="59.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Importer votre jeu de données" />
+            <Text fx:id="ok1" fill="#09a80f" layoutX="190.0" layoutY="93.0" opacity="0.5" strokeType="OUTSIDE" strokeWidth="0.0" />
+            <Text fx:id="nok1" fill="#b20404" layoutX="190.0" layoutY="93.0" strokeType="OUTSIDE" strokeWidth="0.0" />
+            <Group fx:id="step1" layoutX="37.0" layoutY="42.0">
+               <children>
+                  <Button fx:id="openBtn1" layoutX="69.0" layoutY="34.0" mnemonicParsing="false" onAction="#openJeuDonnees" text="Import CSV" />
+                  <Text layoutX="75.0" layoutY="4.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Importer votre jeu de données" />
+                  <MenuButton fx:id="help1" layoutX="240.0" layoutY="-13.0" mnemonicParsing="false" text="?">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Action 1" />
+                      <MenuItem mnemonicParsing="false" text="Action 2" />
+                    </items>
+                  </MenuButton>
+                  <Text layoutX="10.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" text="1">
+                     <font>
+                        <Font name="System Bold" size="42.0" />
+                     </font>
+                     <effect>
+                        <DropShadow radius="9.75" width="20.0" />
+                     </effect>
+                  </Text>
+               </children>
+            </Group>
             <Separator layoutX="48.0" layoutY="130.0" prefHeight="16.0" prefWidth="312.0" />
-            <ImageView fitHeight="42.0" fitWidth="55.0" layoutX="37.0" layoutY="55.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../res/one.png" />
-               </image>
-            </ImageView>
-            <Button fx:id="generateBtn" layoutX="472.0" layoutY="313.0" mnemonicParsing="false" onAction="#readCSV" prefHeight="99.0" prefWidth="179.0" text="Générer Planning" textAlignment="CENTER" wrapText="true">
+            <Button fx:id="generateBtn" disable="true" layoutX="502.0" layoutY="308.0" mnemonicParsing="false" onAction="#readCSV" opacity="0.5" prefHeight="99.0" prefWidth="179.0" text="Générer Planning" textAlignment="CENTER" wrapText="true">
                <font>
                   <Font size="22.0" />
                </font></Button>
-            <ImageView fitHeight="42.0" fitWidth="55.0" layoutX="37.0" layoutY="196.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../res/two.png" />
-               </image>
-            </ImageView>
+            <Group fx:id="step2" disable="true" layoutX="37.0" layoutY="183.0" opacity="0.5">
+               <children>
+                  <Text layoutX="75.0" layoutY="4.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Importer contraintes enseignants" />
+                  <Button fx:id="openBtn2" layoutX="69.0" layoutY="34.0" mnemonicParsing="false" onAction="#openContraintesEns" text="Import CSV" />
+                  <MenuButton fx:id="help2" layoutX="255.0" layoutY="-13.0" mnemonicParsing="false" text="?">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Action 1" />
+                        <MenuItem mnemonicParsing="false" text="Action 2" />
+                     </items>
+                  </MenuButton>
+                  <Text layoutX="10.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" text="2">
+                     <font>
+                        <Font name="System Bold" size="42.0" />
+                     </font>
+                     <effect>
+                        <DropShadow radius="9.75" width="20.0" />
+                     </effect>
+                  </Text>
+               </children>
+            </Group>
             <Separator layoutX="57.0" layoutY="262.0" prefHeight="16.0" prefWidth="312.0" />
-            <Text layoutX="112.0" layoutY="200.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Importer contraintes enseignants" />
-            <Button fx:id="openBtn2" layoutX="106.0" layoutY="217.0" mnemonicParsing="false" onAction="#openContraintesEns" text="Import CSV" />
-            <ImageView fitHeight="42.0" fitWidth="55.0" layoutX="37.0" layoutY="328.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../res/three.png" />
-               </image>
-            </ImageView>
+            <Text fx:id="ok3" fill="#09a80f" layoutX="190.0" layoutY="367.0" strokeType="OUTSIDE" strokeWidth="0.0" />
+            <Text fx:id="nok3" fill="#b20404" layoutX="190.0" layoutY="367.0" strokeType="OUTSIDE" strokeWidth="0.0" />
+            <Group fx:id="step3" disable="true" layoutX="37.0" layoutY="315.0" opacity="0.5">
+               <children>
+                  <Text layoutX="75.0" layoutY="4.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Importer contraintes tuteurs" />
+                  <Button fx:id="openBtn3" layoutX="69.0" layoutY="34.0" mnemonicParsing="false" onAction="#openContraintesTut" text="Import CSV" />
+                  <MenuButton fx:id="help3" layoutX="230.0" layoutY="-13.0" mnemonicParsing="false" text="?">
+                     <items>
+                        <MenuItem mnemonicParsing="false" text="Action 1" />
+                        <MenuItem mnemonicParsing="false" text="Action 2" />
+                     </items>
+                  </MenuButton>
+                  <Text layoutX="10.0" layoutY="50.0" strokeType="OUTSIDE" strokeWidth="0.0" text="3">
+                     <font>
+                        <Font name="System Bold" size="42.0" />
+                     </font>
+                     <effect>
+                        <DropShadow radius="9.75" width="20.0" />
+                     </effect>
+                  </Text>
+               </children>
+            </Group>
             <Separator layoutX="62.0" layoutY="391.0" prefHeight="16.0" prefWidth="312.0" />
-            <Text layoutX="112.0" layoutY="332.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Importer contraintes tuteurs" />
-            <Button fx:id="openBtn3" layoutX="106.0" layoutY="349.0" mnemonicParsing="false" onAction="#openContraintesTut" text="Import CSV" />
-            <MenuButton fx:id="help1" layoutX="289.0" layoutY="42.0" mnemonicParsing="false" text="?">
-              <items>
-                <MenuItem mnemonicParsing="false" text="Action 1" />
-                <MenuItem mnemonicParsing="false" text="Action 2" />
-              </items>
-            </MenuButton>
-            <MenuButton fx:id="help2" layoutX="289.0" layoutY="183.0" mnemonicParsing="false" text="?">
-               <items>
-                  <MenuItem mnemonicParsing="false" text="Action 1" />
-                  <MenuItem mnemonicParsing="false" text="Action 2" />
-               </items>
-            </MenuButton>
-            <MenuButton fx:id="help3" layoutX="289.0" layoutY="315.0" mnemonicParsing="false" text="?">
-               <items>
-                  <MenuItem mnemonicParsing="false" text="Action 1" />
-                  <MenuItem mnemonicParsing="false" text="Action 2" />
-               </items>
-            </MenuButton>
                    <AnchorPane layoutX="435.0" layoutY="14.0" prefHeight="124.0" prefWidth="252.0">
                        <children>
-                           <ListView fx:id="listSalles" prefHeight="101.0" prefWidth="252.0" />
+                  <Group fx:id="step4" disable="true" layoutY="-12.94921875" opacity="0.5">
+                     <children>
+                                 <ListView fx:id="listSalles" layoutX="39.0" layoutY="47.0" onMouseClicked="#launchStep5" prefHeight="101.0" prefWidth="252.0" />
+                        <Text layoutX="14.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Choisissez les salles:" />
+                        <Text layoutX="2.0" layoutY="92.0" strokeType="OUTSIDE" strokeWidth="0.0" text="4">
+                           <font>
+                              <Font name="System Bold" size="42.0" />
+                           </font>
+                           <effect>
+                              <DropShadow radius="9.75" width="20.0" />
+                           </effect>
+                        </Text>
+                     </children>
+                  </Group>
                        </children>
                    </AnchorPane>
-            <AnchorPane layoutX="435.0" layoutY="146.0" prefHeight="114.0" prefWidth="312.0">
+            <AnchorPane layoutX="435.0" layoutY="162.0" prefHeight="124.0" prefWidth="312.0">
                <children>
-                  <DatePicker fx:id="dateDebut" layoutX="145.0" layoutY="14.0" onAction="#validDate" prefHeight="27.0" prefWidth="153.0" promptText="jj/mm/aaaa" />
-                  <DatePicker fx:id="dateFin" layoutX="145.0" layoutY="58.0" prefHeight="27.0" prefWidth="153.0" promptText="jj/mm/aaaa" />
-                  <Text layoutX="45.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Date début" />
-                  <Text layoutX="55.0" layoutY="76.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Date fin" />
+                  <Group fx:id="step5" disable="true" layoutX="12.0" layoutY="13.05078125" opacity="0.5">
+                     <children>
+                        <DatePicker fx:id="dateFin" layoutX="112.0" layoutY="68.94921875" onMouseClicked="#launchStep6" prefHeight="27.0" prefWidth="153.0" promptText="jj/mm/aaaa" />
+                        <Text layoutX="32.0" layoutY="87.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Date fin" />
+                        <DatePicker fx:id="dateDebut" layoutX="112.0" layoutY="26.94921875" onAction="#validDate" prefHeight="27.0" prefWidth="153.0" promptText="jj/mm/aaaa" />
+                        <Text layoutX="32.0" layoutY="46.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Date début" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Choisissez les dates de début et de fin de soutenances" />
+                        <Text layoutX="-12.0" layoutY="59.0" strokeType="OUTSIDE" strokeWidth="0.0" text="5">
+                           <font>
+                              <Font name="System Bold" size="42.0" />
+                           </font>
+                           <effect>
+                              <DropShadow radius="9.75" width="20.0" />
+                           </effect>
+                        </Text>
+                     </children>
+                  </Group>
                </children>
             </AnchorPane>
+            <Text fx:id="ok2" fill="#09a80f" layoutX="190.0" layoutY="235.0" strokeType="OUTSIDE" strokeWidth="0.0" />
+            <Text fx:id="nok2" fill="#b20404" layoutX="190.0" layoutY="235.0" strokeType="OUTSIDE" strokeWidth="0.0" />
          </children>
     </AnchorPane>
   </children>
