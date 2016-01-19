@@ -14,21 +14,21 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javafx.animation.FadeTransition;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SelectionMode;
+import javafx.scene.Group;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class Planning implements Initializable {
 
@@ -38,6 +38,31 @@ public class Planning implements Initializable {
 	MenuButton help2;
 	@FXML
 	MenuButton help3;
+	@FXML
+	Text ok1;
+	@FXML
+	Text nok1;
+	@FXML
+	Text ok2;
+	@FXML
+	Text nok2;
+	@FXML
+	Text ok3;
+	@FXML
+	Text nok3;
+	@FXML
+	Group step1;
+	@FXML
+	Group step2;
+	@FXML
+	Group step3;
+	@FXML
+	Group step4;
+	@FXML
+	Group step5;
+	@FXML
+	Button generateBtn;
+
 
 	@FXML
 	DatePicker 	dateDebut = new DatePicker(), 
@@ -366,10 +391,43 @@ public class Planning implements Initializable {
             if(checkData > 0) {
             	System.err.println("OK " + checkData + " insertions");
                 pathDonnees = file.getAbsolutePath();
+				FadeTransition ft = new FadeTransition(Duration.millis(1000), ok1);
+				ft.setFromValue(0.0);
+				ft.setToValue(1.0);
+				ft.play();
+				ok1.setText("Succès, "+checkData+" soutenances importées");
+
+				// On passe à l'étape 2
+				FadeTransition ft2 = new FadeTransition(Duration.millis(1000), step1);
+				ft2.setFromValue(1.0);
+				ft2.setToValue(0.5);
+				ft2.play();
+				step2.setDisable(false);
+				FadeTransition ft3 = new FadeTransition(Duration.millis(1000), step2);
+				ft3.setFromValue(0.5);
+				ft3.setToValue(1.0);
+				ft3.play();
             }
             else {
             	System.err.println("NOK " + checkData);
             	// If < 0, shows a mistake
+				nok1.setText("Échec, fichier non valide");
+				FadeTransition ft = new FadeTransition(Duration.millis(1000), nok1);
+				ft.setFromValue(0.0);
+				ft.setToValue(1.0);
+				ft.play();
+				new java.util.Timer().schedule(
+						new java.util.TimerTask() {
+							@Override
+							public void run() {
+								FadeTransition ft = new FadeTransition(Duration.millis(1000), nok1);
+								ft.setFromValue(1.0);
+								ft.setToValue(0.0);
+								ft.play();
+							}
+						},
+						3000
+				);
             }
 
         }
@@ -384,10 +442,44 @@ public class Planning implements Initializable {
             if(checkData < 0) {
             	System.err.println("OK pour les contraintes enseignants");
                 pathContraintesEns = file.getAbsolutePath();
+				FadeTransition ft = new FadeTransition(Duration.millis(1000), ok2);
+				ft.setFromValue(0.0);
+				ft.setToValue(1.0);
+				ft.play();
+				ok2.setText("Succès");
+
+				// On passe à l'étape 3
+				FadeTransition ft3 = new FadeTransition(Duration.millis(1000), step2);
+				ft3.setFromValue(1.0);
+				ft3.setToValue(0.5);
+				ft3.play();
+				step3.setDisable(false);
+				FadeTransition ft4 = new FadeTransition(Duration.millis(1000), step3);
+				ft4.setFromValue(0.5);
+				ft4.setToValue(1.0);
+				ft4.play();
+
             }
             else {
             	System.err.println("NOK ligne " + checkData+1);
             	// If > 0, it means error on this line, we add one because count starts from zero in dev
+				FadeTransition ft = new FadeTransition(Duration.millis(1000), nok2);
+				ft.setFromValue(0.0);
+				ft.setToValue(1.0);
+				ft.play();
+				nok2.setText("Échec, erreur à la ligne "+checkData);
+				new java.util.Timer().schedule(
+						new java.util.TimerTask() {
+							@Override
+							public void run() {
+								FadeTransition ft = new FadeTransition(Duration.millis(1000), nok2);
+								ft.setFromValue(1.0);
+								ft.setToValue(0.0);
+								ft.play();
+							}
+						},
+						3000
+				);
             }
 
         }
@@ -402,10 +494,43 @@ public class Planning implements Initializable {
             if(checkData < 0) {
             	System.err.println("OK pour les contraintes tuteurs");
                 pathContraintesTut = file.getAbsolutePath();
+				FadeTransition ft = new FadeTransition(Duration.millis(1000), ok3);
+				ft.setFromValue(0.0);
+				ft.setToValue(1.0);
+				ft.play();
+				ok3.setText("Succès");
+
+				// On passe à l'étape 4
+				FadeTransition ft2 = new FadeTransition(Duration.millis(2000), step3);
+				ft2.setFromValue(1.0);
+				ft2.setToValue(0.5);
+				ft2.play();
+				step4.setDisable(false);
+				FadeTransition ft3 = new FadeTransition(Duration.millis(2000), step4);
+				ft3.setFromValue(0.5);
+				ft3.setToValue(1.0);
+				ft3.play();
             }
             else {
             	System.err.println(checkData+1);
             	// If > 0, it means error on this line, we add one because count starts from zero in dev
+				FadeTransition ft = new FadeTransition(Duration.millis(1000), nok3);
+				ft.setFromValue(0.0);
+				ft.setToValue(1.0);
+				ft.play();
+				nok3.setText("Échec, erreur à la ligne "+checkData);
+				new java.util.Timer().schedule(
+						new java.util.TimerTask() {
+							@Override
+							public void run() {
+								FadeTransition ft = new FadeTransition(Duration.millis(1000), nok3);
+								ft.setFromValue(1.0);
+								ft.setToValue(0.0);
+								ft.play();
+							}
+						},
+						3000
+				);
             }
         }
 	}
@@ -438,6 +563,16 @@ public class Planning implements Initializable {
 	    } while (startCal.getTimeInMillis() < endCal.getTimeInMillis());
 	 
 	    return workDays;
+	}
+
+	public void launchStep5() {
+		step5.setDisable(false);
+		step5.setOpacity(1.0);
+	}
+
+	public void launchStep6() {
+		generateBtn.setDisable(false);
+		generateBtn.setOpacity(1.0);
 	}
 
 }

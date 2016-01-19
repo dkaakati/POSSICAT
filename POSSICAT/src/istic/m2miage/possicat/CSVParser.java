@@ -156,9 +156,7 @@ public class CSVParser {
 	        String cvsSplitBy = ",";
 	        boolean compliant = true;
 	        int nbSoutenances = 0;
-	        
-	        System.err.println(data);
-	        
+
 	        try {
 
 	            br = new BufferedReader(new FileReader(data));
@@ -166,7 +164,6 @@ public class CSVParser {
 	            while (compliant && (line = br.readLine()) != null) {
 	                // use comma as separator
 	                String[] row = line.split(cvsSplitBy);
-	                System.err.println(row.length);
 	            	if(row.length != 6) {
 	            		//-1 means not right number of columns
 	            		return -1;
