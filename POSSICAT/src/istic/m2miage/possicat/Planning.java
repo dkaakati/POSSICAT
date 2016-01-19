@@ -281,90 +281,80 @@ public class Planning implements Initializable {
 		Map<Integer, Boolean> dispoEnseignant = e.getDisponibilites();
 		Map<Integer, Boolean> dispoTuteur = t.getDisponibilites();
 
-		Map<Integer, Integer> creneauxPonderations = new HashMap<Integer, Integer>();
-
-		Set<Integer> dispoEns = dispoEnseignant.keySet();
-		for(int p : dispoEns) {
-			if(dispoEnseignant.get(p) && dispoTuteur.get(p)) {
-				creneauxPonderations.put(p, 0);
-			}
-		}
-
-		// Contrainte selon les horaires des soutenances
-		Set<Integer> periodes = creneauxPonderations.keySet();
-		for(int periode : periodes) {
-			int res = periode%8;
-			if(res==3 || res==4) {
-				creneauxPonderations.put(periode, 1);
-			} else if (res==2 || res==5) {
-				creneauxPonderations.put(periode, 2);
-			} else if (res==1 || res==6) {
-				creneauxPonderations.put(periode, 3);
-			} else if (res==0 || res==7) {
-				creneauxPonderations.put(periode, 5);
-			}
-		}
-		
-		// Contraintes selon les soutenances des tuteurs
-		
-		for(int periode : periodes) {
-			if((periode%8)!=0) {
-				List<Creneau> avant = planning.get(periode-1);
-				for(Creneau c : avant) {
-					if(c.getTuteur() == t) {
-						creneauxPonderations.put(periode, 0);
-					}
-				}
-			}
-			if((periode%8)!=7) {
-				List<Creneau> apres = planning.get(periode+1);
-				for(Creneau c : apres) {
-					if(c.getTuteur() == t) {
-						creneauxPonderations.put(periode, 0);
-					}
-				}
-			}
-			System.err.println("Periode " + periode + " Pondération " + creneauxPonderations.get(periode));
-		}
-		
-		System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxPonderations.keySet());
-		
-		creneauxPonderations = sortByValue(creneauxPonderations);
-
-		System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxPonderations.keySet());
-
 		List<Acteur> listeCandide = new ArrayList<Acteur>(enseignants.list);
 		listeCandide.remove(e);
+		Map<Acteur, Integer> dispoCandide = new HashMap<Acteur, Integer>();
+		for(Acteur candide : listeCandide) {
+			Enseignant ens = (Enseignant)candide;
+			dispoCandide.put(ens, ens.getNbSoutenancesCandide());
+		}
+		
 		Enseignant c = null;
 
 		if(log==0) {
 			System.err.println(listeCandide);
 		}
+		
+		Map<Integer, Integer> creneauxPonderations = new HashMap<Integer, Integer>();
 
-		while(!listeCandide.isEmpty()) {
-
-			for(Acteur act: listeCandide) {
-				Enseignant a = (Enseignant)act;
-				// On récupère le candide a qui il reste le plus de soutenances a voir
-				if(c == null || a.getNbSoutenancesCandide()>c.getNbSoutenancesCandide()) {
-					c = a;
+		Set<Integer> dispoEns = dispoEnseignant.keySet();
+		for(int p : dispoEns) {
+			if(dispoEnseignant.get(p) && dispoTuteur.get(p)) {
+				creneauxPonderations.put(p, 10);
+			}
+		}
+		
+		Set<Integer> periodes = creneauxPonderations.keySet();
+		for(int periode : periodes) {
+			int value = creneauxPonderations.get(periode);
+			
+			int res = periode%8;
+			if(res==3 || res==4) {
+				creneauxPonderations.put(periode, value-4);
+			} else if (res==2 || res==5) {
+				creneauxPonderations.put(periode, value-1);
+			} else if (res==1 || res==6) {
+				creneauxPonderations.put(periode, value+1);
+			} else if (res==0 || res==7) {
+				creneauxPonderations.put(periode, value+4);
+			}
+			
+			if((periode%8)!=0) {
+				List<Creneau> avant = planning.get(periode-1);
+				for(Creneau creneau : avant) {
+					if(creneau.getTuteur() == t) {
+						creneauxPonderations.put(periode, value-5);
+					}
+				}
+			} else if((periode%8)!=7) {
+				List<Creneau> apres = planning.get(periode+1);
+				for(Creneau creneau : apres) {
+					if(creneau.getTuteur() == t) {
+						creneauxPonderations.put(periode, value-5);
+					}
 				}
 			}
-			for(int periode : creneauxPonderations.keySet()) {
+		}
+		
+		System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxPonderations.keySet());
+		
+		creneauxPonderations = sortByValue(creneauxPonderations);
+		dispoCandide = sortByValue(dispoCandide);
+
+		System.err.println("Les creneaux communs entre " + e + " et " + t + " sont " + creneauxPonderations.keySet());
+
+		for(int periode : creneauxPonderations.keySet()) {
+			for(Acteur act: dispoCandide.keySet()) {
+				System.err.println(act);
+				c = (Enseignant)act;
 				if(c.getDisponibilites().get(periode)) {
-					// Vérifier si une salle est disponible
-					System.err.println("SALLES DISPO " + planning.get(periode).size());
 					if(planning.get(periode).size()<nbSalles) {
 						return new Creneau(periode, e, c, t, s);
 					}
 				}
 			}
-			listeCandide.remove(c);
-			c = null;
 		}
-		//resATesterAprem++;
-		//resATesterMatin--;
-		//}
+			
 		return null;
 	}
 
