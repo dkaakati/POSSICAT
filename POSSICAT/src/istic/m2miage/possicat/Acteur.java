@@ -88,6 +88,10 @@ public abstract class Acteur {
 	
 	public void addDisponibilite(int periode) {
 		disponibilites.put(periode, false);
+		decNbSoutenance();
+	}
+	
+	public void decNbSoutenance() {
 		nbSoutenances--;
 	}
 	

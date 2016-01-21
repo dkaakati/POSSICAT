@@ -79,6 +79,7 @@ public class Planning implements Initializable {
 	boolean isFinised = false;
 	int nbInserted = 0;
 	int log = 1;
+	boolean fastInsert = false;
 
 	@FXML
 	private ListView<String> listSalles;
@@ -90,10 +91,11 @@ public class Planning implements Initializable {
 	ListActeur tuteurs = new ListActeur();
 	List<Student> etudiants = new ArrayList<Student>();
 	Map<Integer, List<Creneau>> planning;
+	List<Creneau> impossibleAInserer;
 	
-	private String pathDonnees = "";
-	private String pathContraintesEns = "";
-	private String pathContraintesTut = "";
+	private String pathDonnees = "/Users/fesnault/POSSICAT/POSSICAT/data/donneesLite2.csv";
+	private String pathContraintesEns = "/Users/fesnault/POSSICAT/POSSICAT/data/contraintesEnsLite2.csv";
+	private String pathContraintesTut = "/Users/fesnault/POSSICAT/POSSICAT/data/contraintesTuteurLite3.csv";
 
 	private Stage stage;
 	private Desktop desktop = Desktop.getDesktop();
@@ -135,21 +137,29 @@ public class Planning implements Initializable {
 			System.err.println(enseignants.list.size() + " enseignants");
 			System.err.println(tuteurs.list.size() + " tuteurs");
 		}
+		
+		impossibleAInserer = new ArrayList<Creneau>();
 
 		int nbSoutenances = parser.readCSV(pathDonnees, enseignants, tuteurs, etudiants, nbPeriodesEnTout);
 		if(log==0) {
 			System.err.println(nbSoutenances + " soutenances");
-			System.err.println(etudiants);
+			for(Student s : etudiants) {
+				System.err.println(s.getName() + " " + s.getEnseignant() + " " + s.getTuteur());
+			}
 		}
 
 		for(int i = 0; i < nbSoutenances; i++) {
 			insertData();
 		}
 		
+		if(log==0) {
+			System.err.println(impossibleAInserer);
+		}
+		
 		Calendar c = Calendar.getInstance();
 		c.set(dateDebut.getValue().getYear(), dateDebut.getValue().getMonthValue(), dateDebut.getValue().getDayOfMonth());
 		
-		parser.writeData(planning, sallesSelectionnees, c, nbPeriodesParJour);
+		parser.writeData(planning, sallesSelectionnees, c, nbPeriodesParJour, impossibleAInserer);
 
 		desktop.open(new File(System.getProperty("user.home")+"/Downloads/generatedCSV.csv"));
 
@@ -159,10 +169,12 @@ public class Planning implements Initializable {
 	public void insertData() {
 		boolean inserted = false;
 		
-		if(log==0) {
-			System.err.println("On récupère l'acteur le moins disponible (enseignant ou tuteur)");
-		}
+		
 		Acteur act = getActeurLeMoinsDisponible();
+		if(log==0) {
+			System.err.println("On récupère l'acteur le moins disponible (enseignant ou tuteur)" + act);
+		}
+		Acteur tmp = act;
 		Enseignant e = null;
 		Tuteur t = null;
 		if(act instanceof Enseignant) {
@@ -180,12 +192,60 @@ public class Planning implements Initializable {
 			System.err.println("Liste des acteurs en relation avec " + act + " => " + l);
 		}
 		
+		insertion:
 		while(!inserted) {
 			if(l.list.isEmpty()) {
 				if(log==0) {
-					System.err.println("On génère une exception");
+					System.err.println("Impossible d'insérer l'acteur. On le place dans une liste complémentaire");
 				}
-				new Exception("On génère une exception");
+				if(tmp instanceof Enseignant) {
+					e = (Enseignant)tmp;
+				} else {
+					t = (Tuteur)tmp;
+				}
+				l = new ListActeur(tmp.getRelations());
+				if(log==0) {
+					System.err.println("Liste " + l);
+				}
+				act = l.getActeurLeMoinsDisponible();
+				
+				if(act instanceof Enseignant) {
+					e = (Enseignant)act;
+				} else {
+					t = (Tuteur)act;
+				}
+				
+				if(log==0) {
+					System.err.println("Enseignant à supprimer : " + e);
+					System.err.println("Tuteur à supprimer : " + t);
+				}
+				
+				e.decNbSoutenance();
+				t.decNbSoutenance();
+				
+				e.removeRelation(t);
+				t.removeRelation(e);
+				
+				if(e.aFaitToutesLesSoutenances()) {
+					enseignants.list.remove(e);
+				}
+				if(t.aFaitToutesLesSoutenances()) {
+					tuteurs.list.remove(t);
+				}
+				
+				if(log==0) {
+					System.err.println("SOUTENANCES DU TUTEURS " + t.getNbSoutenances());
+				}
+				
+				Student s = getStudent(e, t);
+				removeStudent(s);
+				if(log==0) {
+					System.err.println("Etudiant " + s);
+				}
+				impossibleAInserer.add(new Creneau(-1, e, null, t, s));
+				
+				inserted = true;
+				break insertion;
 			}
 			
 			act = l.getActeurLeMoinsDisponible();
@@ -226,6 +286,7 @@ public class Planning implements Initializable {
 				
 				e.removeRelation(t);
 				t.removeRelation(e);
+				removeStudent(s);
 				
 				if(e.aFaitToutesLesSoutenances()) {
 					enseignants.list.remove(e);
@@ -254,12 +315,18 @@ public class Planning implements Initializable {
 
 	private Student getStudent(Enseignant e, Tuteur t) {
 		for(Student s : etudiants) {
+			if(log==0) {
+				System.err.println(s.getEnseignant() + " " + e + " ET " + s.getTuteur() + " " + t);
+			}
 			if(s.getEnseignant() == e && s.getTuteur() == t) {
-				etudiants.remove(s);
 				return s;
 			}
 		}
 		return null;
+	}
+	
+	private void removeStudent(Student s) {
+		etudiants.remove(s);
 	}
 
 	public Acteur getActeurLeMoinsDisponible() {
@@ -312,13 +379,13 @@ public class Planning implements Initializable {
 			
 			int res = periode%8;
 			if(res==3 || res==4) {
-				creneauxPonderations.put(periode, value-4);
+				creneauxPonderations.put(periode, value-6);
 			} else if (res==2 || res==5) {
-				creneauxPonderations.put(periode, value-1);
+				creneauxPonderations.put(periode, value-4);
 			} else if (res==1 || res==6) {
-				creneauxPonderations.put(periode, value+1);
+				creneauxPonderations.put(periode, value-2);
 			} else if (res==0 || res==7) {
-				creneauxPonderations.put(periode, value+4);
+				creneauxPonderations.put(periode, value+1);
 			}
 			
 			value = creneauxPonderations.get(periode);
@@ -327,14 +394,14 @@ public class Planning implements Initializable {
 				List<Creneau> avant = planning.get(periode-1);
 				for(Creneau creneau : avant) {
 					if(creneau.getTuteur() == t) {
-						creneauxPonderations.put(periode, value-5);
+						creneauxPonderations.put(periode, value-14);
 					}
 				}
 			} else if((periode%8)!=7) {
 				List<Creneau> apres = planning.get(periode+1);
 				for(Creneau creneau : apres) {
 					if(creneau.getTuteur() == t) {
-						creneauxPonderations.put(periode, value-5);
+						creneauxPonderations.put(periode, value-14);
 					}
 				}
 			}
@@ -354,7 +421,7 @@ public class Planning implements Initializable {
 		for(int periode : creneauxPonderations.keySet()) {
 			for(Acteur act: dispoCandide.keySet()) {
 				if(log==0) {
-					System.err.println(act);
+					//System.err.println(act);
 				}
 				c = (Enseignant)act;
 				if(c.getDisponibilites().get(periode)) {
@@ -407,7 +474,13 @@ public class Planning implements Initializable {
 		help1.getItems().setAll(helpPopup1);
 		help2.getItems().setAll(helpPopup2);
 		help3.getItems().setAll(helpPopup3);
-
+		
+		if(fastInsert) {
+			launchStep5();
+			launchStep6();
+			step3.setDisable(false);
+			step4.setDisable(false);
+		}
 	}
 	
 	public void validDate() {

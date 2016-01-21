@@ -66,10 +66,10 @@ public class CSVParser {
             		
                     Acteur a = null;
                     if(r == Role.Enseignant) {
-                    	a = new Enseignant(row[0]);
+                    	a = new Enseignant(row[0].trim());
                     }
                     if(r == Role.Tuteur) {
-                    	a = new Tuteur(row[0]);
+                    	a = new Tuteur(row[0].trim());
                     }
                     a.setDisponibilites(contraintes);
                     acteurs.list.add(a);
@@ -116,9 +116,9 @@ public class CSVParser {
             while ((line = br.readLine()) != null) {
                 // use comma as separator
                 String[] row = line.split(cvsSplitBy);
-                String stu_name = row[0];
-                String ens_name = row[4];
-                String tut_name = row[5];
+                String stu_name = row[0].trim();
+                String ens_name = row[4].trim();
+                String tut_name = row[5].trim();
                 
                 Enseignant e = (Enseignant)enseignants.get(ens_name);
                 e.incNbSoutenances();
@@ -233,9 +233,10 @@ public class CSVParser {
 	 * @param sallesSelectionnees 
 	 * @param date 
 	 * @param nbPeriodesParJour 
+	 * @param impossibleAInserer 
 	 * @throws IOException 
 	 */
-	public void writeData(Map<Integer, List<Creneau>> planning, ObservableList<String> sallesSelectionnees, Calendar date, int nbPeriodesParJour) throws IOException {
+	public void writeData(Map<Integer, List<Creneau>> planning, ObservableList<String> sallesSelectionnees, Calendar date, int nbPeriodesParJour, List<Creneau> impossibleAInserer) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		Set<Integer> periodes = planning.keySet();
 		sb.append("sep=,\n");
@@ -263,6 +264,17 @@ public class CSVParser {
 			}
 			sb.append("\n");
 		}
+		
+		sb.append(",,,,,,,,,,,\n");
+		sb.append(",,,,,,,,,,,\n");
+		sb.append("Soutenances qui posent problemes :,,,,,,,,,,,\n");
+		for(Creneau c : impossibleAInserer) {
+			sb.append(c.getStudent() + ","
+					+ c.getTuteur() + ","
+					+ c.getEnseignant() + "\n");
+		}
+		
+		
 		//System.out.println(sb.toString());
 		Files.write(sb, new File(System.getProperty("user.home")+"/Downloads/generatedCSV.csv"), Charsets.UTF_8);
 	}

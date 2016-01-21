@@ -6,7 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
-public class Main extends Application {
+public class MainPOSSICAT extends Application {
 	
 	@Override
     public void start(Stage primaryStage) throws Exception{
@@ -14,7 +14,7 @@ public class Main extends Application {
     	
     	FXMLLoader loader = new FXMLLoader();
     	
-    	loader.setLocation(getClass().getResource("./Window.fxml"));
+    	loader.setLocation(getClass().getResource("/Window.fxml"));
     	
     	loader.setController(p);
     	Parent root = loader.<Parent>load();
