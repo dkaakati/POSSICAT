@@ -78,18 +78,24 @@ public class Planning implements Initializable {
 		nbSalles; // Nombre de salles disponibles
 	boolean isFinised = false;
 	int nbInserted = 0;
-	int log = 1;
+	int log = 0;
 	boolean fastInsert = false;
 
 	@FXML
 	private ListView<String> listSalles;
-
-	protected ListProperty<String> listProperty = new SimpleListProperty<>();
-	protected List<String> salles = new ArrayList<>();
 	
-	ListActeur enseignants = new ListActeur();
-	ListActeur tuteurs = new ListActeur();
-	List<Student> etudiants = new ArrayList<Student>();
+	@FXML
+	private ListView<String> listContraintes;
+
+	protected ListProperty<String> listDesSalles = new SimpleListProperty<>();
+	protected List<String> salles = new ArrayList<>();
+	protected ListProperty<String> listDesContraintes = new SimpleListProperty<>();
+	protected List<String> contraintes = new ArrayList<>();
+	String contrainteForte = "Tuteurs";
+	
+	ListActeur enseignants;
+	ListActeur tuteurs;
+	List<Student> etudiants;
 	Map<Integer, List<Creneau>> planning;
 	List<Creneau> impossibleAInserer;
 	
@@ -109,6 +115,10 @@ public class Planning implements Initializable {
 
 	public void readCSV() throws IOException {
 		
+		enseignants = new ListActeur();
+		tuteurs = new ListActeur();
+		etudiants = new ArrayList<Student>();
+		
 		if(pathDonnees.isEmpty() || pathContraintesEns.isEmpty() || pathContraintesTut.isEmpty()) {
 			return;
 		}
@@ -120,6 +130,16 @@ public class Planning implements Initializable {
 		nbPeriodesParJour = 8;
 		
 		ObservableList<String> sallesSelectionnees = listSalles.getSelectionModel().getSelectedItems();
+		ObservableList<String> contraintesSelectionnees = listContraintes.getSelectionModel().getSelectedItems();
+		
+		if(contraintesSelectionnees.size()==1) {
+			contrainteForte = contraintesSelectionnees.get(0);
+		}
+		
+		if(log==1) {
+			System.err.println(contrainteForte);
+		}
+		
 		nbSalles = sallesSelectionnees.size();
 
 		nbPeriodesEnTout = nbPeriodesParJour*nbJours;
@@ -377,15 +397,24 @@ public class Planning implements Initializable {
 		for(int periode : periodes) {
 			int value = creneauxPonderations.get(periode);
 			
+			int contrTuteurs = 5;
+			int contrHoraires = 10;
+			
+			if(contrainteForte.equals("Tuteurs")) {
+				contrTuteurs = -20;
+			} else {
+				contrHoraires = -15;
+			}
+			
 			int res = periode%8;
 			if(res==3 || res==4) {
-				creneauxPonderations.put(periode, value-6);
+				creneauxPonderations.put(periode, value+contrHoraires);
 			} else if (res==2 || res==5) {
-				creneauxPonderations.put(periode, value-4);
+				creneauxPonderations.put(periode, value+contrHoraires+4);
 			} else if (res==1 || res==6) {
-				creneauxPonderations.put(periode, value-2);
+				creneauxPonderations.put(periode, value+contrHoraires+6);
 			} else if (res==0 || res==7) {
-				creneauxPonderations.put(periode, value+1);
+				creneauxPonderations.put(periode, value+contrHoraires+8);
 			}
 			
 			value = creneauxPonderations.get(periode);
@@ -394,14 +423,14 @@ public class Planning implements Initializable {
 				List<Creneau> avant = planning.get(periode-1);
 				for(Creneau creneau : avant) {
 					if(creneau.getTuteur() == t) {
-						creneauxPonderations.put(periode, value-14);
+						creneauxPonderations.put(periode, value+contrTuteurs);
 					}
 				}
 			} else if((periode%8)!=7) {
 				List<Creneau> apres = planning.get(periode+1);
 				for(Creneau creneau : apres) {
 					if(creneau.getTuteur() == t) {
-						creneauxPonderations.put(periode, value-14);
+						creneauxPonderations.put(periode, value+contrTuteurs);
 					}
 				}
 			}
@@ -447,9 +476,17 @@ public class Planning implements Initializable {
 		salles.add("i51");
 		salles.add("Jersey");
 		salles.add("Guernesey");
-		listSalles.itemsProperty().bind(listProperty);
+		listSalles.itemsProperty().bind(listDesSalles);
 		listSalles.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		listProperty.set(FXCollections.observableArrayList(salles));
+		listDesSalles.set(FXCollections.observableArrayList(salles));
+		
+		/**
+		 * Gestion des contraintes
+		 */
+		contraintes.add("Tuteurs");
+		contraintes.add("Horaires");
+		listContraintes.itemsProperty().bind(listDesContraintes);
+		listDesContraintes.set(FXCollections.observableArrayList(contraintes));
 		
 		/**
 		 * Gestion des dates

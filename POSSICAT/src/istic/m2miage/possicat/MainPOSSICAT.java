@@ -20,7 +20,7 @@ public class MainPOSSICAT extends Application {
     	Parent root = loader.<Parent>load();
     	
     	primaryStage.setTitle("PossiJar");
-        primaryStage.setScene(new Scene(root, 800, 450));
+        primaryStage.setScene(new Scene(root, 800, 500));
         primaryStage.show();
 	}
 	
