@@ -1,5 +1,6 @@
 package istic.m2miage.possicat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +92,10 @@ public abstract class Acteur {
 		decNbSoutenance();
 	}
 	
+	public void addIndisponibilite(int periode) {
+		disponibilites.put(periode, false);
+	}
+	
 	public void decNbSoutenance() {
 		nbSoutenances--;
 	}
@@ -101,6 +106,13 @@ public abstract class Acteur {
 	
 	public boolean aFaitToutesLesSoutenances() {
 		return nbSoutenances==0;
+	}
+	
+	public void setDefaultDisponibilites(int nbPeriodesEnTout) {
+		disponibilites = new HashMap<Integer, Boolean>();
+		for(int i = 0 ; i < nbPeriodesEnTout; i++) {
+			disponibilites.put(i, true);
+		}
 	}
 	
 	@Override

@@ -90,7 +90,7 @@
             <Separator layoutX="62.0" layoutY="391.0" prefHeight="16.0" prefWidth="312.0" />
                    <AnchorPane layoutX="435.0" layoutY="14.0" prefHeight="124.0" prefWidth="252.0">
                        <children>
-                  <Group fx:id="step4" disable="true" layoutY="-12.94921875" opacity="0.5">
+                  <Group fx:id="step4" layoutY="-12.94921875" opacity="0.5">
                      <children>
                                  <ListView fx:id="listSalles" layoutX="39.0" layoutY="47.0" onMouseClicked="#launchStep5" prefHeight="101.0" prefWidth="252.0" />
                         <Text layoutX="14.0" layoutY="43.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Choisissez les salles:" />
