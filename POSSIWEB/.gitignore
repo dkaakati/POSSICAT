@@ -1,0 +1,11 @@
+/target/
+/.settings/
+/.project
+/.tomcatplugin
+/.classpath
+
+hibernate.cfg.xml
+
+# corentin
+deploy.sh
+/bin/

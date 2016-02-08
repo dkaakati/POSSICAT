@@ -34,10 +34,12 @@ public class ListActeur {
 
 	public Acteur getActeurLeMoinsDisponible() {
 		Acteur leMoinsDispo = null;
+		System.err.println(leMoinsDispo);
 		for(Acteur a : list) {
-			//System.err.println(a + " " + a.nestPlusActeur() + " " + a.getNbSoutenances());
+			System.err.println(a + " " + a.getDisponibilitesSoutenances());
 			if(leMoinsDispo == null || (a.getDisponibilitesSoutenances() < leMoinsDispo.getDisponibilitesSoutenances())) {
 				if(!a.nestPlusActeur()) {
+					System.err.println(a);
 					leMoinsDispo = a;
 				}
 			}

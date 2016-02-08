@@ -172,6 +172,13 @@ public class AlgoPlanningImplV3 {
 		this.nbPeriodesParJour = nbPeriodesParJour;
 		this.contrainteForte = contrainteForte;
 		
+		enseignants = new ListActeur();
+		tuteurs = new ListActeur();
+		etudiants = new ArrayList<Student>();
+		planning = new HashMap<Integer, List<Creneau>>();
+		impossibleAInserer = new ArrayList<Creneau>();
+		this.sallesSelectionnees = new ArrayList<String>();
+		
 		configureCreneaux();
 		CSVParser parser = new CSVParser();
 		parser.readDispo(pathContraintesEns, Role.Enseignant, enseignants, nbPeriodesParJour);
@@ -183,6 +190,7 @@ public class AlgoPlanningImplV3 {
 	private void configureSalles(ObservableList<String> rooms) {
 		nbSalles = rooms.size();
 		System.err.println(rooms);
+		sallesSelectionnees.clear();
 		for(String r : rooms) {
 			sallesSelectionnees.add(r);
 		}
