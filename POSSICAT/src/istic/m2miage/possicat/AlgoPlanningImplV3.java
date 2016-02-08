@@ -25,12 +25,6 @@ import javafx.collections.ObservableList;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
-import fr.istic.iodeman.model.Participant;
-import fr.istic.iodeman.model.Planning;
-import fr.istic.iodeman.model.Room;
-import fr.istic.iodeman.model.TimeBox;
-import fr.istic.iodeman.model.Unavailability;
-
 /**
  * @author François Esnault, Petit Emmanuel [M2 MIAGE]
  * @date 1 févr. 2016
@@ -65,101 +59,13 @@ public class AlgoPlanningImplV3 {
 		impossibleAInserer = new ArrayList<Creneau>();
 		sallesSelectionnees = new ArrayList<String>();
 	}
-	
 
-	public void configure(Planning planning_infos,
-			Collection<Participant> participants,
-			Collection<TimeBox> timeboxes,
-			Collection<Unavailability> unavailabilities) {
-		
-		nbPeriodesEnTout = timeboxes.size();
-		
-		
-		configureSalles(planning_infos.getRooms());
-		
-		configureCreneaux();
-		
-		configureParticipants(participants);
-		
-		configureUnavailabilities(timeboxes, unavailabilities);
-		
-		nbSoutenances = participants.size();
-		
-	}
-
-	/**
-	 * @param rooms
-	 */
-	private void configureSalles(Collection<Room> rooms) {
-		nbSalles = rooms.size();
-		for(Room r : rooms) {
-			sallesSelectionnees.add(r.getName());
-		}
-	}
-
-
-	private void configureUnavailabilities(Collection<TimeBox> timeboxes,
-			Collection<Unavailability> unavailabilities) {
-		getNbDePeriodesParJour(timeboxes);
-		Map<String, Integer> resolveTimeBox = new HashMap<String, Integer>();
-		int idTimeBox = 0;
-		for(TimeBox t : timeboxes) {
-			resolveTimeBox.put(t.getFrom().hashCode() + " " + t.getTo().hashCode(), idTimeBox++);
-		}
-		
-		for(Unavailability u : unavailabilities) {
-			String email = u.getPerson().getEmail();
-			if(enseignants.get(email)!=null) {
-				enseignants.get(email).addDisponibilite(resolveTimeBox.get(u.getPeriod().getFrom() + " " + u.getPeriod().getTo()));
-			} else {
-				Iterator<Student> it = etudiants.iterator();
-				loop:
-				while(it.hasNext()) {
-					Student s = it.next();
-					if(s.getName().equals(email)) {
-						s.getTuteur().addIndisponibilite(resolveTimeBox.get(u.getPeriod().getFrom().hashCode() + " " + u.getPeriod().getTo().hashCode()));
-						break loop;
-					}
-				}
-			}
-		}
-	}
-
-	private void getNbDePeriodesParJour(Collection<TimeBox> timeboxes) {
-		// TODO
-		nbPeriodesParJour = 9;
-	}
 
 
 	private void configureCreneaux() {
 		for(int periode = 0; periode < nbPeriodesEnTout ; periode++) {
 			List<Creneau> salles = new ArrayList<Creneau>();
 			planning.put(periode, salles);
-		}
-	}
-
-	private void configureParticipants(Collection<Participant> participants) {
-		for(Participant p : participants) {
-			String teacher = p.getFollowingTeacher().getEmail();
-			String tutor = p.getTutorFullName();
-			
-			Enseignant e = (Enseignant) enseignants.get(teacher);
-			if(e==null) {
-				e = new Enseignant(teacher);
-				e.setDefaultDisponibilites(nbPeriodesEnTout); 
-				enseignants.list.add(e);
-			}
-			
-			Tuteur t = (Tuteur) tuteurs.get(tutor);
-            if(t==null) {
-            	t = new Tuteur(tutor);
-            	t.setDefaultDisponibilites(nbPeriodesEnTout);
-            	tuteurs.list.add(t);
-            }
-			
-			addRelationBetweenTeacherAndTutor(teacher, tutor, e, t);
-            
-            etudiants.add(new Student(p.getStudent().getEmail(), e, t));
 		}
 	}
 	
@@ -568,7 +474,7 @@ public class AlgoPlanningImplV3 {
 		}
 		
 		System.err.println(sb.toString());
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssSSS");
 		Date now = new Date();
 		File f = new File("Soutenances_"+sdf.format(now)+".csv");
 		Files.write(sb.toString(), f, Charsets.UTF_8);
